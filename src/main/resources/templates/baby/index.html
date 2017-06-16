@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="layout/layout :: htmlhead(title='Baby Log 首页')"></head>
+<body class="am-with-topbar-fixed-top am-scrollable-vertical">
+
+<div th:replace="layout/layout :: header"></div>
+
+
+<div class="baby_a">
+    <div class="am-g am-container">
+        <div class="am-u-lg-12 am-u-md-6 am-u-sm-12">
+            <h1 th:text="'Name:'+${baby.name}">Name:XXX</h1>
+
+            <p th:text="'出生于:'+${#dates.format(baby.brithday, 'yyyy-MM-dd')}+'，年龄:'+${baby.getAge()}+'，您的孩子已经出生：'+${baby.getBetweenDay()}+'天了。 系统中共有'+${count}+'条关于杨瑞曦的记录。'">
+                出生于:2012-03-22，年龄:1，您的孩子已经出生：88天了。 系统中共有88条关于杨瑞曦的记录。
+            </p>
+            <a type="button" class="am-btn am-btn-success am-btn-primary am-radius" th:href="@{/baby/blog/}">点击查看所有记录</a>
+        </div>
+    </div>
+</div>
+
+
+<div class="theday am-g am-g-fixed am-animation-fade">
+    <div class="am-panel am-panel-default">
+        <div class="am-panel-hd">那年今天>>>></div>
+        <div class="am-panel-bd">
+
+            <!--  am-icon-female 妈妈图标   am-icon-thumbs-o-up  am-icon-bicycle-->
+            <a th:if="${list.size()<1}" th:href="@{/baby/add}">那年今天没有数据，不如今天为孩子添加一条数据吧：）</a>
+
+            <ul class="am-list am-list-static am-list-border am-list-striped am-animation-fade" th:each="blog:${list}">
+                <li><i class="am-icon-male am-icon-fw"></i>
+                    <span th:text="${blog.user.amilymembers}+': 在 '+${#dates.format(blog.create_time, 'yyyy-MM-dd HH:mm')}+'添加了一条记录.宝贝已经出生'+${blog.getBetween()[0]}+'天'">爸爸:在2012-06-10 12:00:11添加了数据。 宝贝已经出生80天或3个月</span>
+                </li>
+                <li class="am-panel-bd" th:if="${blog.first} != ''"><i class="am-icon-thumbs-o-up am-icon-fw"></i>
+                    <span th:text="${blog.first}">first。</span></li>
+                <li class="am-panel-bd" th:if="${blog.language} != ''"><i class="am-icon-language am-icon-fw"></i>
+                    <span th:text="${blog.language}">language。</span></li>
+                <li class="am-panel-bd" th:if="${blog.cognitive} != ''"><i class="am-icon-university am-icon-fw"></i>
+                    <span th:text="${blog.cognitive}">cognitive。</span></li>
+                <li class="am-panel-bd" th:if="${blog.blog} != ''"><i class="am-icon-pencil am-icon-fw"></i>
+                    <span th:utext="${blog.blog}">这里是日记。</span></li>
+            </ul>
+
+        </div>
+
+
+    </div>
+</div>
+
+<div class=" am-g am-g-fixed am-animation-fade">
+    <div class="am-panel am-panel-default">
+        <div class="am-panel-hd">宝贝身高体重>>>></div>
+        <div class="am-panel-bd">
+
+
+            <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
+            <div class="am-container" id="main" style="width:100%;height:400px;"></div>
+
+        </div>
+
+    </div>
+</div>
+
+    <!-- home.js -->
+    <script th:src="@{/amazeui/assets/js/home.js}"></script>
+    <div th:replace="layout/layout :: footer"></div>
+
+
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="layout/layout :: htmlhead(title='Baby Log')"></head>
+<body class="am-with-topbar-fixed-top am-animation-fade">
+
+
+<div class="apploginheader">
+    <div class="am-g">
+        <h1>Baby Log</h1>
+        <p>My Baby My Love!<br>任时光匆匆，记点点滴滴。</p>
+    </div>
+    <hr>
+</div>
+<div class="am-g am-g-fixed am-u-sm-centered ">
+    <div class="am-u-lg-6 am-u-md-8 am-u-sm-centered">
+        <h3>请先登录</h3>
+        <hr>
+
+
+        <form method="post" class="am-form am-form-horizontal" th:action="@{/loginfrom}">
+            <div class="am-form-group ">
+                <label for="doc-ipt-3" class="am-u-sm-2 am-form-label">用户:</label>
+                <div class="am-u-sm-10">
+                    <input type="text" id="doc-ipt-3" name="username"  placeholder="输入你的用户">
+                </div>
+            </div>
+
+            <div class="am-form-group">
+                <label for="doc-ipt-pwd-2" class="am-u-sm-2 am-form-label">密码:</label>
+                <div class="am-u-sm-10">
+                    <input type="password" id="doc-ipt-pwd-2" name="password"  placeholder="输入你的密码">
+                </div>
+            </div>
+            <div class="am-form-group">
+                <div class="am-u-sm-10 am-u-sm-offset-2">
+                    <button type="submit" class="am-btn am-btn-success am-btn-primary am-btn-block">提交登入</button>
+                </div>
+            </div>
+        </form>
+        <hr>
+        <p style="text-align: center;">Version:3.0.0 By 爸爸 2017-06-18</p>
+    </div>
+</div>
+
+
+
+
+
+</body>
+</html>

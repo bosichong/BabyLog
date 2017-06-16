@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:fragment="htmlhead (title)">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title th:text="${title}" >Title</title>
+    <!-- amazeui -->
+    <link th:href="@{/amazeui/assets/css/amazeui.min.css}" rel="stylesheet">
+    <link th:href="@{/amazeui/assets/css/admin.css}" rel="stylesheet">
+    <!-- 当前站点CSS样式文件 -->
+    <link th:href="@{/amazeui/assets/css/app.css}" rel="stylesheet">
+
+    <!-- jQuery -->
+    <script th:src="@{/amazeui/assets/js/jquery.min.js}"></script>
+    <!-- amazeui.js app.js -->
+    <script th:src="@{/amazeui/assets/js/amazeui.min.js}"></script>
+    <script th:src="@{/amazeui/assets/js/app.js}"></script>
+    <!-- 引入 ECharts 文件-->
+    <script th:src="@{/amazeui/assets/js/echarts.min.js}"></script>
+
+
+</head>
+
+
+<!--<head lang="en">-->
+    <!--<meta charset="UTF-8">-->
+    <!--<title>Landing Page | Amaze UI Example</title>-->
+    <!--<meta http-equiv="X-UA-Compatible" content="IE=edge">-->
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1">-->
+    <!--<meta name="format-detection" content="telephone=no">-->
+    <!--<meta name="renderer" content="webkit">-->
+    <!--<meta http-equiv="Cache-Control" content="no-siteapp">-->
+    <!--<link rel="alternate icon" type="image/png" href="/i/favicon.png">-->
+    <!--<link rel="stylesheet" href="/css/amazeui.min.css">-->
+
+<!--</head>-->
+
+<body>
+    <header class="am-topbar am-topbar-fixed-top" th:id="header" th:fragment="header">
+        <div class="am-container">
+            <h1 class="am-topbar-brand">
+                <a th:href="@{/baby/home/}">Baby Log</a>
+            </h1>
+
+            <button class="am-topbar-btn am-topbar-toggle am-btn am-btn-sm am-btn-secondary am-show-sm-only" data-am-collapse="{target: '#collapse-head'}"><span class="am-sr-only">导航切换</span> <span class="am-icon-bars"></span></button>
+
+            <div class="am-collapse am-topbar-collapse" id="collapse-head">
+                <ul class="am-nav am-nav-pills am-topbar-nav">
+                    <li><a th:href="@{/baby/home/}">首页</a></li>
+                    <li><a th:href="@{/baby/add/}">添加记录</a></li>
+                    <li><a th:href="@{/baby/blog/}">日志列表</a></li>
+                    <li class="am-dropdown" data-am-dropdown="">
+                        <a class="am-dropdown-toggle" data-am-dropdown-toggle="" href="javascript:;">
+                            详细日志 <span class="am-icon-caret-down"></span>
+                        </a>
+                        <ul class="am-dropdown-content">
+                            <li class="am-dropdown-header">细节记录</li>
+                            <li><a href="#">第一次</a></li>
+                            <li><a href="#">学会语言</a></li>
+                            <li><a href="#">认知事物</a></li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <div class="am-topbar-right">
+                    <a class="am-btn am-btn-success am-radius am-topbar-btn" th:href="@{/logout}"><span class="am-icon-sign-out"></span>退出登陆</a>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+<div class="col-sm-2" th:fragment="sidebar">
+    <div class="panel-group" id="accordion">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne"><i class="glyphicon glyphicon-user"></i> 会 员 管 理</a>
+                </h4>
+            </div>
+            <div id="collapseOne" class="panel-collapse collapse in">
+                <div class="panel-body">
+                    <ul class=" nav nav-pills nav-stacked">
+                        <li><a th:href="@{/admin/user/list}" href="#">会员列表</a></li>
+                        <li><a th:href="@{/admin/user/addUser}" href="#">添加会员</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo"><i class="glyphicon glyphicon-list"></i> 权 限 管 理
+                    </a>
+                </h4>
+            </div>
+            <div id="collapseTwo" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <ul class=" nav nav-pills nav-stacked">
+                        <li><a href="/baby2015/index.php/Admin/Auth/accessList.html">权限列表</a></li>
+                        <li><a href="/baby2015/index.php/Admin/Auth/accessAdd.html">添加权限</a></li>
+                        <li><a href="/baby2015/index.php/Admin/Auth/groupList.html">角色管理</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree"><i class="glyphicon glyphicon-edit"></i> 内 容 修 改</a>
+                </h4>
+            </div>
+            <div id="collapseThree" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <ul class=" nav nav-pills nav-stacked">
+                        <li><a href="/baby2015/index.php/Admin/Edit/index.html">修改文章</a></li>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<footer class="footer am-g am-g-fixed" th:fragment="footer" th:id="footer">
+
+
+        <p class="text-center"><span style="color:#0bb59b;">任时光匆匆，</span><span>记点点滴滴。</span></p>
+        <p class="text-center" style="color:#333;">Version:3.0.0 By 爸爸 2017-06-18</p>
+
+
+
+</footer>
+
+</body>
+</html>

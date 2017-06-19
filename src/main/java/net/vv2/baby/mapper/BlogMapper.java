@@ -113,7 +113,7 @@ public interface BlogMapper {
      * @param day 那年今天
      * @return list
      */
-    @Select("SELECT * from bb_blog WHERE month(create_time) = ${month} and day(create_time) = ${day} and year(create_time) != #{year} ORDER BY create_time")
+    @Select("SELECT * from bb_blog WHERE month(create_time) = ${month} and day(create_time) = ${day} and year(create_time) != #{year} ORDER BY create_time DESC")
     @Results({
             @Result(id = true,column = "id",property = "id"),
             @Result(column = "first",property = "first"),

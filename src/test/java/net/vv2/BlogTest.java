@@ -1,5 +1,6 @@
 package net.vv2;
 
+import com.xiaoleilu.hutool.crypto.SecureUtil;
 import com.xiaoleilu.hutool.date.DateUtil;
 import net.vv2.Utils.PageHelp;
 import net.vv2.baby.domain.Baby;
@@ -121,6 +122,12 @@ public class BlogTest {
  //    System.out.println(blogService.selectAllCognitive());
    //     System.out.println(blogService.selectAllLanguage());
        System.out.println(blogService.selectAllFirst());
+    }
+
+
+    @Test
+    public void md5(){
+        System.out.println(SecureUtil.md5("admin"));
     }
 
 

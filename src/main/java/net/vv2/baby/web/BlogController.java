@@ -61,7 +61,8 @@ public class BlogController {
         System.out.println(year);
         String month = DateUtil.month(today)+1+"";
         String day = DateUtil.dayOfMonth(today)+"";
-        List<Blog> list = blogService.selectOldBlog(month,day,year);//获得那年今天的历史数据
+       // List<Blog> list = blogService.selectOldBlog(month,day,year);//获得那年今天的历史数据
+        List<Blog> list = blogService.selectOldBlog("04","15",year);//测试那年今天的历史数据
 
         model.addAttribute("baby",baby);
         model.addAttribute("count",count);
@@ -182,6 +183,42 @@ public class BlogController {
         model.addAttribute("key",key);
         model.addAttribute("list",list);
         return "/baby/blog";
+    }
+
+    /**
+     * firstlist
+     * @param model
+     * @return
+     */
+    @RequestMapping("/firstList")
+    public String firstList(Model model){
+        List<Blog> list = blogService.selectAllFirst();
+        model.addAttribute("list",list);
+        return "/baby/firstList";
+    }
+
+    /**
+     * languagelist
+     * @param model
+     * @return
+     */
+    @RequestMapping("/languageList")
+    public String languageList(Model model){
+        List<Blog> list = blogService.selectAllLanguage();
+        model.addAttribute("list",list);
+        return "/baby/languageList";
+    }
+
+    /**
+     * cognitivelist
+     * @param model
+     * @return
+     */
+    @RequestMapping("/cognitiveList")
+    public String cognitiveList(Model model){
+        List<Blog> list = blogService.selectAllCognitive();
+        model.addAttribute("list",list);
+        return "/baby/cognitiveList";
     }
 
 

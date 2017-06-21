@@ -21,6 +21,7 @@
     <script th:src="@{/amazeui/assets/js/app.js}"></script>
     <!-- 引入 ECharts 文件-->
     <script th:src="@{/amazeui/assets/js/echarts.min.js}"></script>
+    <link rel="alternate icon" type="image/png" th:href="@{/image/baby.png}" >
 
 
 </head>
@@ -59,11 +60,13 @@
                         </a>
                         <ul class="am-dropdown-content">
                             <li class="am-dropdown-header">细节记录</li>
-                            <li><a href="#">第一次</a></li>
-                            <li><a href="#">学会语言</a></li>
-                            <li><a href="#">认知事物</a></li>
+                            <li><a th:href="@{/baby/firstList}">第一次</a></li>
+                            <li><a th:href="@{/baby/languageList}">学会语言</a></li>
+                            <li><a th:href="@{/baby/cognitiveList}">认知事物</a></li>
                         </ul>
                     </li>
+                    <!-- 判断权限，是否显示后台管理连接-->
+                    <li th:if="${session.user.getGm() > 4}"><a th:href="@{/admin/home}">后台管理</a></li>
                 </ul>
 
                 <div class="am-topbar-right">
@@ -131,7 +134,7 @@
 <footer class="footer am-g am-g-fixed" th:fragment="footer" th:id="footer">
 
 
-        <p class="text-center"><span style="color:#0bb59b;">任时光匆匆，</span><span>记点点滴滴。</span></p>
+        <p class="text-center"><span style="color:#0bb59b;">任凭时光匆匆，</span><span>记录点点滴滴。</span></p>
         <p class="text-center" style="color:#333;">Version:3.0.0 By 爸爸 2017-06-18</p>
 
 

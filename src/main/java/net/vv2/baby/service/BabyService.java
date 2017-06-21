@@ -12,6 +12,26 @@ import java.util.List;
 public interface BabyService {
 
     /**
+     * add
+     * @param baby
+     * @return
+     */
+    int addBaby(Baby baby);
+
+    /**
+     * update
+     * @param baby
+     * @return
+     */
+    int updBaby(Baby baby);
+
+    /**
+     * delete
+     * @param id
+     * @return
+     */
+    int delBaby(Integer id);
+    /**
      * 根据ID搜索
      * @param id
      * @return BABY

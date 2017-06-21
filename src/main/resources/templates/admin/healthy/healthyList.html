@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="layout/adminLayout :: htmlhead(title='BabyLog HealthyList')"></head>
+<body class="am-with-topbar-fixed-top am-scrollable-vertical">
+
+<div th:replace="layout/adminLayout :: header"></div>
+
+<div class="am-cf admin-main">
+    <!-- sidebar start -->
+    <div th:replace="layout/adminLayout :: sidebar"></div>
+    <!-- sidebar end -->
+
+    <!-- content start -->
+    <div class="admin-content">
+        <div class="admin-content-body">
+            <div class="am-cf am-padding am-padding-bottom-0">
+                <div class="am-fl am-cf"><strong class="am-text-primary am-text-lg">Healthy</strong> / <small>Healthy List</small></div>
+            </div>
+            <hr>
+
+            <div class="am-g">
+                <div class="am-u-sm-12">
+                    <table class="am-table am-table-bd am-table-striped admin-content-table">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>身高（厘米）</th>
+                            <th>体重（公斤）</th>
+                            <th>记录时间</th>
+                            <th>所属宝贝</th>
+                            <th>编辑删除</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="healthy : ${list}">
+                            <td th:text="${healthy.id}">1</td>
+                            <td th:text="${healthy.height}">John Clark</td>
+                            <td th:text="${healthy.weight}"></td>
+                            <td th:text="${#calendars.format(healthy.create_time,'yyyy-MM-dd')}"></td>
+                            <td th:text="${healthy.baby.getName()}"></td>
+                            <td>
+                                <div class="am-dropdown" data-am-dropdown="">
+                                    <button class="am-btn am-btn-default am-btn-xs am-dropdown-toggle"
+                                            data-am-dropdown-toggle=""><span class="am-icon-cog"></span> <span
+                                            class="am-icon-caret-down"></span></button>
+                                    <ul class="am-dropdown-content">
+                                        <li><a th:href="@{/admin/healthy/editHealthy/{uid}(uid=${healthy.id})}">1. 编辑</a></li>
+                                        <li><a th:href="@{/admin/healthy/delHealthy/{uid}(uid=${healthy.id})}">2. 删除</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+        </div>
+        <!-- footer-->
+        <div th:replace="layout/adminLayout :: footer"></div>
+    </div>
+
+
+</div>
+<!-- content end -->
+
+
+</div>
+
+
+</body>
+</html>

@@ -6,39 +6,46 @@
 
 <div class="apploginheader">
     <div class="am-g">
-        <h1>Baby Log</h1>
-        <p>My Baby My Love!<br>任时光匆匆，记点点滴滴。</p>
+        <img th:src="@{/image/baby.png}" />
+        <p class="text-center"><span style="color:#0bb59b;">任凭时光匆匆，</span><span>记录点点滴滴。</span></p>
     </div>
-    <hr>
 </div>
 <div class="am-g am-g-fixed am-u-sm-centered ">
     <div class="am-u-lg-6 am-u-md-8 am-u-sm-centered">
-        <h3>请先登录</h3>
-        <hr>
+
+        <div class="tpl-login">
+            <div class="tpl-login-content">
+                <div class="tpl-login-logo">
+
+                </div>
 
 
-        <form method="post" class="am-form am-form-horizontal" th:action="@{/loginfrom}">
-            <div class="am-form-group ">
-                <label for="doc-ipt-3" class="am-u-sm-2 am-form-label">用户:</label>
-                <div class="am-u-sm-10">
-                    <input type="text" id="doc-ipt-3" name="username"  placeholder="输入你的用户">
-                </div>
-            </div>
 
-            <div class="am-form-group">
-                <label for="doc-ipt-pwd-2" class="am-u-sm-2 am-form-label">密码:</label>
-                <div class="am-u-sm-10">
-                    <input type="password" id="doc-ipt-pwd-2" name="password"  placeholder="输入你的密码">
-                </div>
+                <form class="am-form tpl-form-line-form" th:action="@{/loginfrom}">
+                    <div class="am-form-group">
+                        <input type="text" class="tpl-form-input" name="username" placeholder="请输入账号">
+
+                    </div>
+
+                    <div class="am-form-group">
+                        <input type="password" class="tpl-form-input" name="password" placeholder="请输入密码">
+
+                    </div>
+
+
+
+
+
+
+
+                    <div class="am-form-group">
+
+                        <button type="submit" class="am-btn am-btn-success am-btn-block">提交</button>
+
+                    </div>
+                </form>
             </div>
-            <div class="am-form-group">
-                <div class="am-u-sm-10 am-u-sm-offset-2">
-                    <button type="submit" class="am-btn am-btn-success am-btn-primary am-btn-block">提交登入</button>
-                </div>
-            </div>
-        </form>
-        <hr>
-        <p style="text-align: center;">Version:3.0.0 By 爸爸 2017-06-18</p>
+        </div>
     </div>
 </div>
 

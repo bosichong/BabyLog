@@ -21,6 +21,21 @@ public class BabyServiceImpl implements BabyService {
 
 
     @Override
+    public int addBaby(Baby baby) {
+        return babyMapper.addBaby(baby);
+    }
+
+    @Override
+    public int updBaby(Baby baby) {
+        return babyMapper.updBaby(baby);
+    }
+
+    @Override
+    public int delBaby(Integer id) {
+        return babyMapper.delBaby(id);
+    }
+
+    @Override
     public Baby selectBabyById(Integer id) {
         return babyMapper.selectBabyById(id);
     }

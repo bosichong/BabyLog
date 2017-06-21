@@ -14,6 +14,12 @@ public class User {
 
     public  User(){}
 
+    public User(String name, Integer gm, String amilymembers) {
+        this.name = name;
+        this.gm = gm;
+        this.amilymembers = amilymembers;
+    }
+
     public User(String name, String password, Integer gm, String amilymembers) {
         this.name = name;
         this.password = password;

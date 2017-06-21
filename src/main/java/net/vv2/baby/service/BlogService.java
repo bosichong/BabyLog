@@ -84,5 +84,22 @@ public interface BlogService {
     int selectKeyCount(String key);
 
 
+    /**
+     * 返回cognitive
+     * @return
+     */
+    List<Blog> selectAllCognitive();
+    /**
+     * 返回language
+     * @return
+     */
+    List<Blog> selectAllLanguage();
+    /**
+     * 返回first
+     * @return
+     */
+    List<Blog> selectAllFirst();
+
+
 
 }

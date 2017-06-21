@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="layout/adminLayout :: htmlhead(title='BabyLog Edit User')"></head>
+<body class="am-with-topbar-fixed-top am-scrollable-vertical">
+
+<div th:replace="layout/adminLayout :: header"></div>
+
+<div class="am-cf admin-main">
+    <!-- sidebar start -->
+    <div th:replace="layout/adminLayout :: sidebar"></div>
+    <!-- sidebar end -->
+
+    <!-- content start -->
+    <div class="admin-content">
+        <div class="admin-content-body">
+
+            <div class="am-cf am-padding am-padding-bottom-0">
+                <div class="am-fl am-cf"><strong class="am-text-primary am-text-lg">User</strong> /
+                    <small>Edit User</small>
+                </div>
+            </div>
+            <hr>
+
+            <div class="am-g am-g-fixed adduser">
+
+
+                <form class="am-form am-form-horizontal" th:action="@{/admin/user/updUser}">
+                    <input type="hidden"  name="id"  th:value="${user.id}">
+
+
+                    <div class="am-form-group">
+                        <label for="user-name" class="am-u-sm-2 am-form-label">登陆用户名</label>
+                        <div class="am-u-sm-10">
+                            <input type="text" id="user-name" name="name" placeholder="登陆用户名" th:value="${user.name}">
+
+                        </div>
+                    </div>
+
+                    <div class="am-form-group">
+                        <label for="user-password" class="am-u-sm-2 am-form-label">密码</label>
+                        <div class="am-u-sm-10">
+                            <input type="password" id="user-password" name="password" placeholder="更新密码，如果不填则不修改。。。">
+
+                        </div>
+                    </div>
+
+                    <div class="am-form-group">
+                        <label for="user-gm" class="am-u-sm-2 am-form-label">管理权限</label>
+                        <div class="am-u-sm-10">
+                            <input type="number" id="user-gm" name="gm" placeholder="管理权限" th:value="${user.gm}">
+                        </div>
+                    </div>
+
+                    <div class="am-form-group">
+                        <label for="user-amilymembers" class="am-u-sm-2 am-form-label">家庭职业</label>
+                        <div class="am-u-sm-10">
+                            <input type="text" id="user-amilymembers" name="amilymembers" placeholder="输入你的家庭职业"
+                                   th:value="${user.amilymembers}">
+                        </div>
+                    </div>
+
+
+                    <div class="am-form-group">
+                        <div class="am-u-sm-9 am-u-sm-push-3">
+                            <button type="submit" class="am-btn am-btn-primary">提交数据</button>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+
+
+        </div>
+        <!-- footer-->
+        <div th:replace="layout/adminLayout :: footer"></div>
+    </div>
+
+
+</div>
+<!-- content end -->
+
+
+</div>
+
+
+</body>
+</html>

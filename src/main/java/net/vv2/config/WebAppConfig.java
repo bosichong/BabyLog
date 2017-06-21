@@ -1,5 +1,6 @@
 package net.vv2.config;
 
+import net.vv2.baby.web.Interceptor.MyAdminInterceptor;
 import net.vv2.baby.web.Interceptor.MyInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -21,6 +22,7 @@ public class WebAppConfig extends WebMvcConfigurerAdapter{
 
 
         registry.addInterceptor(new MyInterceptor()).addPathPatterns("/baby/**");//添加拦截器并配置拦截请求
+        registry.addInterceptor(new MyAdminInterceptor()).addPathPatterns("/admin/**");//后台管理权限拦截判断
 
     }
 }

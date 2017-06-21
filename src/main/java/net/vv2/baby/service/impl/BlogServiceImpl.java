@@ -68,4 +68,19 @@ public class BlogServiceImpl implements BlogService {
     public int selectKeyCount(String key) {
         return blogMapper.selectKeyCount(key);
     }
+
+    @Override
+    public List<Blog> selectAllCognitive() {
+        return blogMapper.selectAllCognitive();
+    }
+
+    @Override
+    public List<Blog> selectAllLanguage() {
+        return blogMapper.selectAllLanguage();
+    }
+
+    @Override
+    public List<Blog> selectAllFirst() {
+        return blogMapper.selectAllFirst();
+    }
 }

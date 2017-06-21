@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="layout/layout :: htmlhead(title='宝贝的第一次')"></head>
+<body class="am-with-topbar-fixed-top am-scrollable-vertical">
+
+<div th:replace="layout/layout :: header"></div>
+
+
+<div class="theday am-g am-g-fixed">
+
+    <div class="mysearch am-container">
+
+            <form class="am-form am-form-horizontal " th:action="@{/baby/blog}">
+                <div class="am-input-group am-input-group-primary am-input-group-success">
+                    <input type="text" name="key" class="am-form-field" placeholder="搜索关键字：妈妈，压岁钱，玩具等">
+                    <span class="am-input-group-btn">
+                        <button class="am-btn am-btn-success" type="submit"><span class="am-icon-search"></span></button>
+                    </span>
+                </div>
+            </form>
+
+    </div>
+
+
+    <div class="am-panel am-panel-default">
+        <div class="am-panel-hd">宝贝的第一次>></div>
+        <div class="am-panel-bd">
+
+            <!--  am-icon-female 妈妈图标   am-icon-thumbs-o-up  am-icon-bicycle-->
+
+            <ul class="am-list am-list-static am-list-border am-list-striped am-animation-fade" th:each="blog:${list}">
+                <li><i class="am-icon-male am-icon-fw"></i>
+                    <span th:text="${blog.user.amilymembers}+': 在 '+${#dates.format(blog.create_time, 'yyyy-MM-dd HH:mm')}+'添加了一条记录.宝贝已经出生'+${blog.getBetween()[0]}+'天'">爸爸:在2012-06-10 12:00:11添加了数据。 宝贝已经出生80天或3个月</span>
+                </li>
+                <li class="am-panel-bd" th:if="${blog.first} != ''"><i class="am-icon-thumbs-o-up am-icon-fw"></i>
+                    <span th:text="${blog.first}">first。</span></li>
+            </ul>
+
+        </div>
+
+
+
+
+    </div>
+</div>
+
+</div>
+
+
+<div th:replace="layout/layout :: footer"></div>
+
+
+</body>
+</html>

@@ -30,3 +30,15 @@
 .mysearch{
     width:50%;
     margin-bottom: 15px;}
+
+
+
+
+/*_________________________________________后台CSS*/
+
+.admin-main {padding-top: 0px;}
+
+.adduser{margin-top: 50px;}
+.am-topbar-inverse{
+    background-color: #5eb95e;
+    border-color: #5eb95e;}

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:fragment="htmlhead (title)">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title th:text="${title}" >Title</title>
+    <!-- amazeui -->
+    <link th:href="@{/amazeui/assets/css/amazeui.min.css}" rel="stylesheet">
+    <link th:href="@{/amazeui/assets/css/admin.css}" rel="stylesheet">
+    <!-- 当前站点CSS样式文件 -->
+    <link th:href="@{/amazeui/assets/css/app.css}" rel="stylesheet">
+
+    <!-- jQuery -->
+    <script th:src="@{/amazeui/assets/js/jquery.min.js}"></script>
+    <!-- amazeui.js-->
+    <script th:src="@{/amazeui/assets/js/amazeui.min.js}"></script>
+    <!--  app后台.js -->
+    <script th:src="@{/amazeui/assets/js/app_admin.js}"></script>
+    <!-- 引入 ECharts 文件-->
+    <script th:src="@{/amazeui/assets/js/echarts.min.js}"></script>
+    <link rel="alternate icon" type="image/png" th:href="@{/image/baby.png}" >
+
+
+</head>
+
+
+<!--<head lang="en">-->
+<!--<meta charset="UTF-8">-->
+<!--<title>Landing Page | Amaze UI Example</title>-->
+<!--<meta http-equiv="X-UA-Compatible" content="IE=edge">-->
+<!--<meta name="viewport" content="width=device-width, initial-scale=1">-->
+<!--<meta name="format-detection" content="telephone=no">-->
+<!--<meta name="renderer" content="webkit">-->
+<!--<meta http-equiv="Cache-Control" content="no-siteapp">-->
+<!--<link rel="alternate icon" type="image/png" href="/i/favicon.png">-->
+<!--<link rel="stylesheet" href="/css/amazeui.min.css">-->
+
+<!--</head>-->
+
+<body>
+
+<header class="am-topbar am-topbar-inverse admin-header">
+    <div class="am-topbar-brand">
+        <strong>BabyLog</strong> <small>后台管理</small>
+    </div>
+
+    <button class="am-topbar-btn am-topbar-toggle am-btn am-btn-sm am-btn-success am-show-sm-only" data-am-collapse="{target: '#topbar-collapse'}"><span class="am-sr-only">导航切换</span> <span class="am-icon-bars"></span></button>
+
+    <div class="am-collapse am-topbar-collapse" id="topbar-collapse">
+
+        <ul class="am-nav am-nav-pills am-topbar-nav am-topbar-right admin-header-list">
+            <li class="am-dropdown" data-am-dropdown="">
+                <a class="am-dropdown-toggle" data-am-dropdown-toggle="" href="javascript:;">
+                    <span class="am-icon-users"></span> 管理员 <span class="am-icon-caret-down"></span>
+                </a>
+                <ul class="am-dropdown-content">
+                    <li><a href="#"><span class="am-icon-user"></span> 资料</a></li>
+                    <li><a href="#"><span class="am-icon-cog"></span> 设置</a></li>
+                    <li><a th:href="@{/logout}"><span class="am-icon-power-off"></span> 退出</a></li>
+                </ul>
+            </li>
+            <li class="am-hide-sm-only"><a href="javascript:;" id="admin-fullscreen"><span class="am-icon-arrows-alt"></span> <span class="admin-fullText">开启全屏</span></a></li>
+        </ul>
+    </div>
+</header>
+
+
+
+
+
+<sidebar class="admin-sidebar am-offcanvas" id="admin-offcanvas">
+    <div class="am-offcanvas-bar admin-offcanvas-bar">
+        <ul class="am-list admin-sidebar-list">
+            <li><a th:href="@{/baby/home}"><span class="am-icon-home"></span>前台首页</a></li>
+            <li class="admin-parent">
+                <a class="am-cf" data-am-collapse="{target: '#user-nav'}"><span class="am-icon-user"></span>User<span class="am-icon-angle-right am-fr am-margin-right"></span></a>
+                <ul class="am-list am-collapse admin-sidebar-sub am-in" id="user-nav">
+                    <li><a th:href="@{/admin/user/addUser}" class="am-cf"><span class="am-icon-plus"></span>Add User</a></li>
+                    <li><a th:href="@{/admin/user/userList}"><span class="am-icon-edit"></span>Edit User</a></li>
+                </ul>
+            </li>
+            <li class="admin-parent">
+                <a class="am-cf" data-am-collapse="{target: '#baby-nav'}"><span class="am-icon-child"></span>Baby<span class="am-icon-angle-right am-fr am-margin-right"></span></a>
+                <ul class="am-list am-collapse admin-sidebar-sub am-in" id="baby-nav">
+                    <li><a th:href="@{/admin/baby/addBaby}" class="am-cf"><span class="am-icon-plus"></span>Add Baby</span></a></li>
+                    <li><a th:href="@{/admin/baby/babyList}"><span class="am-icon-edit"></span>Edit Baby</a></li>
+                </ul>
+            </li>
+
+            <li class="admin-parent">
+                <a class="am-cf" data-am-collapse="{target: '#blog-nav'}"><span class="am-icon-flag"></span>Blog + Healthy<span class="am-icon-angle-right am-fr am-margin-right"></span></a>
+                <ul class="am-list am-collapse admin-sidebar-sub am-in" id="blog-nav">
+
+                    <li><a th:href="@{/admin/blog/blogList}"><span class="am-icon-edit"></span>Edit Blog</a></li>
+                    <li><a th:href="@{/admin/healthy/healthyList}"><span class="am-icon-edit"></span>Edit Healthy</a></li>
+                </ul>
+            </li>
+
+        </ul>
+
+        <div class="am-panel am-panel-default admin-sidebar-panel">
+            <div class="am-panel-bd">
+                <p>碎碎念:</p>
+                <p>岁月如风，唯有此忆。—— 爸爸</p>
+            </div>
+        </div>
+
+
+</sidebar>
+
+
+<footer class="footer am-g" th:fragment="footer" th:id="footer">
+    <hr/>
+    <p class="text-center"><span style="color:#0bb59b;">任凭时光匆匆，</span><span>记录点点滴滴。</span></p>
+    <p class="text-center" style="color:#333;">Version:3.0.0 By 爸爸 2017-06-18</p>
+
+
+
+</footer>
+
+</body>
+</html>

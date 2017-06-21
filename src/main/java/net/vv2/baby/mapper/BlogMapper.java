@@ -24,10 +24,15 @@ public interface BlogMapper {
     int addBlog(Blog blog);
 
 
-    @Update("update bb_blog set first = #{first},language = #{language},cognitive = #{cognitive},blog = #{blog},create_time = #{create_time}," +
+    @Update("update bb_blog set first = #{first},language = #{language},cognitive = #{cognitive},blog = #{blog}," +
             "update_time = #{update_time},baby_id = #{baby.id},user_id = #{user.id} where id = #{id}")
     int updBlog(Blog blog);
 
+    /**
+     * 根据ID删除一个USER
+     * @param id
+     * @return
+     */
     @Delete("delete from bb_blog where id = #{id}")
     int delBlog(Integer id);
 
@@ -78,6 +83,78 @@ public interface BlogMapper {
                             fetchType = FetchType.EAGER))
     })
     List<Blog> selectAll();
+
+
+    /**
+     * 返回first数据
+     * @return
+     */
+    @Select("select * from bb_blog where first != '' ORDER BY create_time DESC")
+    @Results({
+            @Result(id = true,column = "id",property = "id"),
+            @Result(column = "first",property = "first"),
+            @Result(column = "language",property = "language"),
+            @Result(column = "cognitive",property = "cognitive"),
+            @Result(column = "blog",property = "blog"),
+            @Result(column = "create_time",property = "create_time"),
+            @Result(column = "update_time",property = "update_time"),
+            @Result(column = "baby_id",property = "baby",
+                    one = @One(
+                            select = "net.vv2.baby.mapper.BabyMapper.selectBabyById",
+                            fetchType = FetchType.EAGER)),
+            @Result(column = "user_id",property = "user",
+                    one = @One(select = "net.vv2.baby.mapper.UserMapper.selectUserById",
+                            fetchType = FetchType.EAGER))
+    })
+    List<Blog> selectAllFirst();
+
+
+    /**
+     * 返回language数据
+     * @return
+     */
+    @Select("select * from bb_blog where language != '' ORDER BY create_time DESC")
+    @Results({
+            @Result(id = true,column = "id",property = "id"),
+            @Result(column = "first",property = "first"),
+            @Result(column = "language",property = "language"),
+            @Result(column = "cognitive",property = "cognitive"),
+            @Result(column = "blog",property = "blog"),
+            @Result(column = "create_time",property = "create_time"),
+            @Result(column = "update_time",property = "update_time"),
+            @Result(column = "baby_id",property = "baby",
+                    one = @One(
+                            select = "net.vv2.baby.mapper.BabyMapper.selectBabyById",
+                            fetchType = FetchType.EAGER)),
+            @Result(column = "user_id",property = "user",
+                    one = @One(select = "net.vv2.baby.mapper.UserMapper.selectUserById",
+                            fetchType = FetchType.EAGER))
+    })
+    List<Blog> selectAllLanguage();
+
+
+    /**
+     * 返回cognitive数据
+     * @return
+     */
+    @Select("select * from bb_blog where cognitive != '' ORDER BY create_time DESC")
+    @Results({
+            @Result(id = true,column = "id",property = "id"),
+            @Result(column = "first",property = "first"),
+            @Result(column = "language",property = "language"),
+            @Result(column = "cognitive",property = "cognitive"),
+            @Result(column = "blog",property = "blog"),
+            @Result(column = "create_time",property = "create_time"),
+            @Result(column = "update_time",property = "update_time"),
+            @Result(column = "baby_id",property = "baby",
+                    one = @One(
+                            select = "net.vv2.baby.mapper.BabyMapper.selectBabyById",
+                            fetchType = FetchType.EAGER)),
+            @Result(column = "user_id",property = "user",
+                    one = @One(select = "net.vv2.baby.mapper.UserMapper.selectUserById",
+                            fetchType = FetchType.EAGER))
+    })
+    List<Blog> selectAllCognitive();
 
 
     /**

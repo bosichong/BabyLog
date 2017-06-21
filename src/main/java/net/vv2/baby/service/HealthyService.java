@@ -37,4 +37,12 @@ public interface HealthyService {
      * @return list
      */
     public List<Healthy> selectAll();
+
+
+    /**
+     * 根据ID搜索
+     * @param id
+     * @return
+     */
+    Healthy selectHealthyById(Integer id);
 }

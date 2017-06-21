@@ -116,6 +116,13 @@ public class BlogTest {
 
     }
 
+    @Test
+    public void selectOther(){
+ //    System.out.println(blogService.selectAllCognitive());
+   //     System.out.println(blogService.selectAllLanguage());
+       System.out.println(blogService.selectAllFirst());
+    }
+
 
 
 

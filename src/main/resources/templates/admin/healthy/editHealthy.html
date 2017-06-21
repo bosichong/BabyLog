@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="layout/adminLayout :: htmlhead(title='BabyLog Edit Healthy')"></head>
+<body class="am-with-topbar-fixed-top am-scrollable-vertical">
+
+<div th:replace="layout/adminLayout :: header"></div>
+
+<div class="am-cf admin-main">
+    <!-- sidebar start -->
+    <div th:replace="layout/adminLayout :: sidebar"></div>
+    <!-- sidebar end -->
+
+    <!-- content start -->
+    <div class="admin-content">
+        <div class="admin-content-body">
+
+            <div class="am-cf am-padding am-padding-bottom-0">
+                <div class="am-fl am-cf"><strong class="am-text-primary am-text-lg">Healthy</strong> /
+                    <small>Edit Healthy</small>
+                </div>
+            </div>
+            <hr>
+
+            <div class="am-g am-g-fixed adduser">
+
+
+                <form class="am-form am-form-horizontal" th:action="@{/admin/healthy/updHealthy}">
+                    <input type="hidden"  name="id"  th:value="${healthy.id}">
+
+
+                    <div class="am-form-group">
+                        <label for="height" class="am-u-sm-2 am-form-label">身高（厘米）：</label>
+                        <div class="am-u-sm-10">
+                            <input type="text" id="height" name="height" placeholder="身高（厘米）" th:value="${healthy.height}">
+
+                        </div>
+                    </div>
+                    <div class="am-form-group">
+                        <label for="weight" class="am-u-sm-2 am-form-label">体重（公斤）：</label>
+                        <div class="am-u-sm-10">
+                            <input type="text" id="weight" name="weight" placeholder="体重（公斤）" th:value="${healthy.weight}">
+
+                        </div>
+                    </div>
+
+
+
+                    <div class="am-form-group">
+                        <label for="create_time" class="am-u-sm-2 am-form-label">记录时间</label>
+                        <div class="am-u-sm-10">
+                            <input type="text" class="am-form-field" id="create_time" placeholder="编辑记录时间" data-am-datepicker readonly required name="create_time" th:value="${#calendars.format(healthy.create_time,'yyyy-MM-dd')}"/>
+
+                        </div>
+                    </div>
+
+
+                    <div class="am-form-group ">
+                        <label for="baby_id" class="am-u-sm-3 am-form-label">宝贝 / Baby</label>
+                        <div class="am-u-sm-9 am-radio">
+                            <label><input type="radio" name="baby_id" id="baby_id" th:value="${healthy.baby.getId()}"
+                                          checked="checked" th:text="${healthy.baby.getName()}"></label>
+                        </div>
+                    </div>
+
+
+                    <div class="am-form-group">
+                        <div class="am-u-sm-9 am-u-sm-push-3">
+                            <button type="submit" class="am-btn am-btn-primary">提交数据</button>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+
+
+        </div>
+        <!-- footer-->
+        <div th:replace="layout/adminLayout :: footer"></div>
+    </div>
+
+
+</div>
+<!-- content end -->
+
+
+</div>
+
+
+</body>
+</html>

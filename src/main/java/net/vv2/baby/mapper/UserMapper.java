@@ -1,9 +1,9 @@
 package net.vv2.baby.mapper;
 
 import net.vv2.baby.domain.User;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
+
+import java.util.List;
 
 /**
  * @author J.Sky bosichong@qq.com
@@ -12,6 +12,34 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface UserMapper {
 
+
+    /**
+     * 插入一个user数据
+     * @param user
+     * @return
+     */
+    @Insert("insert into bb_user (name,password,gm,amilymembers) values(#{name},#{password},#{gm},#{amilymembers})")
+    @Options(useGeneratedKeys = true,keyProperty = "id")
+    int addUser(User user);
+
+    /**
+     * 更新user数据
+     * @param user
+     * @return
+     */
+    @Update("update bb_user set name = #{name},password = #{password},gm = #{gm},amilymembers = #{amilymembers} where id = #{id}")
+    int updUserPassword(User user);
+
+    /**
+     * 更新user数据
+     * @param user
+     * @return
+     */
+    @Update("update bb_user set name = #{name},gm = #{gm},amilymembers = #{amilymembers} where id = #{id}")
+    int updUser(User user);
+
+    @Delete("delete from bb_user where id = #{id}")
+    int delUser(Integer id);
     /**
      * 根据ID搜索返回一个USER
      * @param id
@@ -19,6 +47,14 @@ public interface UserMapper {
      */
     @Select("select * from bb_user where id = #{id}")
     User selectUserById(Integer id);
+
+
+    /**
+     * 返回所有用户
+     * @return
+     */
+    @Select("select * from bb_user")
+    List<User> selectAll();
 
 
     /**

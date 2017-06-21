@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="layout/adminLayout :: htmlhead(title='BabyLog Blog List')"></head>
+<body class="am-with-topbar-fixed-top am-scrollable-vertical">
+
+<div th:replace="layout/adminLayout :: header"></div>
+
+<div class="am-cf admin-main">
+    <!-- sidebar start -->
+    <div th:replace="layout/adminLayout :: sidebar"></div>
+    <!-- sidebar end -->
+
+    <!-- content start -->
+    <div class="admin-content">
+        <div class="admin-content-body">
+            <div class="am-cf am-padding am-padding-bottom-0">
+                <div class="am-fl am-cf"><strong class="am-text-primary am-text-lg">Blog</strong> /
+                    <small>Blog List</small>
+                </div>
+            </div>
+            <hr>
+
+            <div class="am-g">
+                <div class="am-u-sm-12">
+
+                    <div class="mysearch am-container">
+
+                        <form class="am-form am-form-horizontal " th:action="@{/admin/blog/blogList}">
+                            <div class="am-input-group am-input-group-primary am-input-group-success">
+                                <input type="text" name="key" class="am-form-field" placeholder="搜索关键字：妈妈，压岁钱，玩具等">
+                                <span class="am-input-group-btn">
+                        <button class="am-btn am-btn-success" type="submit"><span
+                                class="am-icon-search"></span></button>
+                    </span>
+                            </div>
+                        </form>
+
+                    </div>
+                    <table class="am-table am-table-bd am-table-striped admin-content-table">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>first</th>
+                            <th>language</th>
+                            <th>cognitive</th>
+                            <th>blog</th>
+                            <th>create_time</th>
+                            <th>update_time</th>
+                            <th>baby</th>
+                            <th>user</th>
+                            <th>编辑删除</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="blog : ${list}">
+                            <td th:text="${blog.id}">1</td>
+                            <td th:text="${blog.first}">John Clark</td>
+                            <td th:text="${blog.language}">John Clark</td>
+                            <td th:text="${blog.cognitive}">John Clark</td>
+                            <td th:text="${blog.blog}">John Clark</td>
+                            <td th:text="${#calendars.format(blog.create_time,'yyyy-MM-dd')}">5</td>
+                            <td th:text="${#calendars.format(blog.update_time,'yyyy-MM-dd')}">5</td>
+                            <td th:text="${blog.baby.getName()}">John Clark</td>
+
+                            <td><span class="am-badge am-badge-success"
+                                      th:text="${blog.user.getAmilymembers()}">爸爸</span>
+                            </td>
+                            <td>
+                                <div class="am-dropdown" data-am-dropdown="">
+                                    <button class="am-btn am-btn-default am-btn-xs am-dropdown-toggle"
+                                            data-am-dropdown-toggle=""><span class="am-icon-cog"></span> <span
+                                            class="am-icon-caret-down"></span></button>
+                                    <ul class="am-dropdown-content">
+                                        <li><a th:href="@{/admin/blog/editBlog/{uid}(uid=${blog.id})}">1. 编辑</a></li>
+                                        <li><a th:href="@{/admin/blog/delBlog/{uid}(uid=${blog.id})}">2. 删除</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+
+
+                        </tbody>
+                    </table>
+                    <ul class="am-pagination am-pagination-centered">
+
+
+                        <th:block th:each="i:${#numbers.sequence(1,totalPage)}">
+                            <!-- 判断是否为当前页，添加am-active-->
+                            <li th:if="${i == pageNum}" th:class="am-active">
+                                <a th:href="@{/admin/blog/blogList(pageNum=${i},key=${key})}" th:text="${i}">1</a>
+                            </li>
+                            <!-- 不是当前页普通输出-->
+                            <li th:if="${i != pageNum}">
+                                <a th:href="@{/admin/blog/blogList(pageNum=${i},key=${key})}" th:text="${i}">1</a>
+                            </li>
+                        </th:block>
+
+
+                    </ul>
+                </div>
+            </div>
+
+
+        </div>
+        <!-- footer-->
+        <div th:replace="layout/adminLayout :: footer"></div>
+    </div>
+
+
+</div>
+<!-- content end -->
+
+
+</div>
+
+
+</body>
+</html>

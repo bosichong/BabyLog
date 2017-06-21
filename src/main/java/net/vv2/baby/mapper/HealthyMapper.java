@@ -56,4 +56,22 @@ public interface HealthyMapper {
                             fetchType = FetchType.EAGER))
     })
     List<Healthy> selectAll();
+
+    /**
+     * 根据ID 搜索返回
+     * @param id
+     * @return
+     */
+    @Select("select * from bb_healthy where id = #{id}")
+    @Results({
+            @Result(id = true,column = "id",property = "id"),
+            @Result(column = "height",property = "height"),
+            @Result(column = "weight",property = "weight"),
+            @Result(column = "create_time",property = "create_time"),
+            @Result(column = "baby_id",property = "baby",
+                    one = @One(
+                            select = "net.vv2.baby.mapper.BabyMapper.selectBabyById",
+                            fetchType = FetchType.EAGER))
+    })
+    Healthy selectHealthyById(Integer id);
 }

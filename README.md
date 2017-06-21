@@ -1,7 +1,7 @@
 
 ### BabyLog
 
-岁月如风，唯有此忆。 任凭时光匆匆，记录点点滴滴。 ---- 爸爸
+岁月如风，唯有此忆。 任凭时光匆匆，记录点点滴滴。 
 
 BabyLog是用来记录孩子成长过程的日记，她包括：日记，语言，认知等，还包括身高，体重，并使用图表展示。
 
@@ -12,3 +12,13 @@ BabyLog是用来记录孩子成长过程的日记，她包括：日记，语言�
 ![输入图片说明](https://git.oschina.net/uploads/images/2017/0622/011519_95062e58_125848.jpeg "后台预览")
 
 ![输入图片说明](https://git.oschina.net/uploads/images/2017/0622/011721_cd764a83_125848.jpeg "在这里输入图片标题")![输入图片说明](https://git.oschina.net/uploads/images/2017/0622/011735_274869e7_125848.jpeg "在这里输入图片标题")
+
+### 介绍
+
+本程序采用 SpringBoot+Mysql+MyBatis+Thymeleaf+Amaze UI 等框架技术支持。
+
+### 启动
+
+建立mysql数据库，导入DOC/下的sql文件
+
+默认管理员帐号及密码：admin

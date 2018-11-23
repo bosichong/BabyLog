@@ -61,8 +61,8 @@ public class BlogController {
         System.out.println(year);
         String month = DateUtil.month(today)+1+"";
         String day = DateUtil.dayOfMonth(today)+"";
-       // List<Blog> list = blogService.selectOldBlog(month,day,year);//获得那年今天的历史数据
-        List<Blog> list = blogService.selectOldBlog("04","15",year);//测试那年今天的历史数据
+        List<Blog> list = blogService.selectOldBlog(month,day,year);//获得那年今天的历史数据
+        //List<Blog> list = blogService.selectOldBlog("04","15",year);//测试那年今天的历史数据
 
         model.addAttribute("baby",baby);
         model.addAttribute("count",count);

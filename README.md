@@ -47,6 +47,5 @@ idea中 找到Mybaby2017Application，然后右键 run Mybaby2017Application，�
 
 或是终端下进入程序目录运行如下代码，也可以启动程序
 
-    cd mybaby2017/ 
     
     mvn spring-boot:run

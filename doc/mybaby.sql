@@ -5,7 +5,7 @@ CREATE TABLE bb_baby
     brithday DATE NOT NULL
 );
 
-
+INSERT INTO `bb_baby` VALUES (1,'大宝贝','2012-03-22');
 
 CREATE TABLE bb_user
 (
@@ -27,9 +27,6 @@ CREATE TABLE bb_healthy
     CONSTRAINT bb_healthy_bb_baby_id_fk FOREIGN KEY (baby_id) REFERENCES bb_baby (id)
 );
 CREATE INDEX bb_healthy_bb_baby_id_fk ON bb_healthy (baby_id);
-
-
-
 
 
 

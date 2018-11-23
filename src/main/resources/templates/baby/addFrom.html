@@ -21,7 +21,9 @@
                     <div class="am-form-group ">
                         <label for="baby_id" class="am-u-sm-3 am-form-label">宝贝 / Baby</label>
                         <div class="am-u-sm-9 am-radio">
-                            <label><input type="radio" name="baby_id" id="baby_id" value="1" checked="checked">杨瑞曦</label>
+                            <select  name="baby_id" id="baby_id">
+                                <option th:each="baby : ${list}" th:value="${baby.id}" th:text="${baby.name}"></option>
+                            </select>
                         </div>
                     </div>
 

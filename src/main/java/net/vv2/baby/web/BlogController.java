@@ -71,8 +71,9 @@ public class BlogController {
     }
 
     @RequestMapping("/add")
-    public String addFrom(){
-
+    public String addFrom(Model model){
+    	List<Baby> list = babyService.selectAllBaby();
+    	model.addAttribute("list", list);
         return "/baby/addFrom";
     }
 

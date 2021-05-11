@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/form.html' import render_form %}
+{% block title %}BabyLog 登录系统 {% endblock %}
+{% block content %}
+<main role="main">
+<div class="jumbotron">
+    <img class="rounded mx-auto d-block" src="{{ url_for('static', filename='baby.png') }}" alt="">
+    <h3 class="text-center text-success">Login BabyLog</h3>
+    <div class="container">
+        
+        
+        <div class="loginform">{{ render_form(form, action=request.full_path) }}
+        </div>
+
+
+    </div>
+
+     </div> 
+     </main>
+
+     {% for message in get_flashed_messages() %}
+     <div class="alert alert-info">
+         <button type="button" class="close" data-dismiss="alert">&times;</button>
+         {{ message }}
+     </div>
+     {% endfor %}
+
+     
+     {% endblock %}

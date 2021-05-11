@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/form.html' import render_form %}
+{% from 'bootstrap/pagination.html' import render_pagination %}
+{% block title %}BabyLog 日志列表{% endblock %}
+{% block content %}
+<main role="main">
+
+
+    <div class="jumbotron">
+
+    <form method="GET" action="/list">
+      <!-- {{ form.csrf_token }} -->
+      {{ form.key }}
+      {{ form.submit}}
+    </form>
+   
+            <!-- {{ render_form(form, action=request.full_path,extra_classes='form-inline') }} -->
+ 
+        {% for blog in blogs %}
+        <table class="table table-striped table-bordered table-hover">
+          <tbody>
+            <tr>
+              <td><i class="fa fa-user fa-lg"></i> {{ blog.user.amilymembers }}: 在<small data-toggle="tooltip" data-placement="top"
+                data-timestamp="{{ blog.create_time.strftime('%Y-%m-%dT%H:%M:%SZ') }}"
+                data-delay="500">
+             {{ moment(blog.create_time).fromNow(refresh=True) }}
+         </small>添加了1条数据</td>
+            </tr>
+            {% if blog.first %}
+            <tr>
+              <td><i class="fa fa-star fa-lg"></i> 第一次：{{  blog.first|safe }}</td>
+            </tr>
+            {% endif %}
+            {% if blog.language %}
+            <tr>
+              <td><i class="fa fa-book fa-lg"></i> 语言：{{  blog.language |safe }}</td>
+            </tr>
+            {% endif %}
+            {% if blog.cognitive %}
+            <tr>
+              <td><i class="fa fa-pencil-square-o fa-lg"></i> 认知：{{  blog.cognitive|safe  }}</td>
+            </tr>
+            {% endif %}
+            {% if blog.blog %}
+            <tr>
+              <td>{{  blog.blog |safe }}<br>
+                {% if current_user.gm == 5 %}
+                <a href="{{ url_for('updBlog',id = blog.id ) }}" target='blank'>编辑此条记录</a>
+                {% endif %}
+              </td>
+              
+            </tr>
+
+            {% endif %}
+  
+        
+          </tbody>
+        </table>
+          
+        {% endfor %}
+
+            {% if blogs %}
+            <div class="page-footer">{{ render_pagination(pagination) }}</div>
+            {% endif %}
+        </div>
+      </div>
+
+
+ 
+
+</main>
+{% endblock content %}

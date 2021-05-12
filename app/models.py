@@ -27,7 +27,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(32), unique=True)
     password = db.Column(db.String(128))
     gm = db.Column(db.Integer)
-    amilymembers = db.Column(db.String(32), unique=True)
+    familymembers = db.Column(db.String(32), unique=True)
     blogs = db.relationship('Blog', backref='user', lazy='dynamic')
 
     def set_password(self, password):  # 用来设置密码的方法，接受密码作为参数
@@ -51,7 +51,7 @@ class Blog(db.Model):
     baby_id = db.Column(db.Integer, db.ForeignKey('baby.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
-    def __inti__(self, first='',language='',cognitive='',blog='',baby_id=1,user_id=1):
+    def __inti__(self, first='',language='',cognitive='',blog='',):
         self.first=first
         self.language=language
         self.cognitive=cognitive

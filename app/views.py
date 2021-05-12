@@ -60,7 +60,7 @@ def index():
 
 @app.route('/api_hrjson')
 def HealthyRestJson():
-    data = Healthy.query.all()
+    data = Healthy.query.order_by(Healthy.create_time).all()
     times = []
     weight = []
     height = []

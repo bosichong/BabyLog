@@ -20,6 +20,12 @@ class HealthyForm(FlaskForm):
     weight = IntegerField('体重：',validators=[DataRequired()])
     submit = SubmitField('添加数据')
 
+class EditHealthyForm(FlaskForm):
+    height = IntegerField('身高：',validators=[DataRequired()])
+    weight = IntegerField('体重：',validators=[DataRequired()])
+    create_time = DateField('日期:',validators=[DataRequired()])
+    submit = SubmitField('添加数据')
+
 class BabyForm(FlaskForm):
     name = StringField('姓名:',validators=[DataRequired()])
     birthday = DateField('生日:',validators=[DataRequired()])

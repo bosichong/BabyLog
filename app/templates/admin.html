@@ -8,7 +8,7 @@ block title %}BabyLog 管理页 {% endblock %} {% block content %}
     >添加用户（用来记录日志的父母亲属）</a>
   | <a href="{{ url_for('addBaby') }}" rel="noopener noreferrer">添加baby</a>
   <hr />
-<p>用户资料管理</p>
+<h3>用户资料管理</h3>
   <table class="table table-bordered">
     <thead>
       <tr>
@@ -30,7 +30,7 @@ block title %}BabyLog 管理页 {% endblock %} {% block content %}
     </tbody>
   </table>
 
-  <p>baby资料管理</p>
+  <h3>baby资料管理</h3>
   <table class="table table-bordered">
     <thead>
       <tr>
@@ -45,6 +45,28 @@ block title %}BabyLog 管理页 {% endblock %} {% block content %}
             <th scope="col">{{ baby.name  }}</th>
             <th scope="col">{{ baby.birthday }}</th>
             <th scope="col">  <a href="{{ url_for('editBaby',id = baby.id ) }}" target="_blank" rel="noopener noreferrer">修改资料</a></th>
+          </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+
+  <h3>baby身高体重管理</h3>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th scope="col">身高</th>
+        <th scope="col">体重</th>
+        <th scope="col">创建日期</th>
+        <th scope="col">操作选项</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for healthy in healthys %}
+        <tr>
+            <th scope="col">{{ healthy.height  }}</th>
+            <th scope="col">{{ healthy.weight }}</th>
+            <th scope="col">{{ healthy.create_time }}</th>
+            <th scope="col">  <a href="{{ url_for('editHealthy',id = healthy.id ) }}" target="_blank" rel="noopener noreferrer">修改数据</a></th>
           </tr>
         {% endfor %}
     </tbody>

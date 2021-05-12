@@ -163,11 +163,15 @@ def addHealthy():
 ###################################
 #用户密码及资料修改
 ###################################
+
+
+
 @app.route('/admin')
 def adminindex():
     users = User.query.all()
     babys = Baby.query.all()
-    return render_template('admin.html',users= users,babys=babys,)
+    healthys = Healthy.query.all()
+    return render_template('admin.html',users= users,babys=babys,healthys = healthys)
 
 @app.route('/adduser', methods=['GET', 'POST'])
 @login_required  
@@ -250,7 +254,22 @@ def editBaby(id):
     form.birthday.data= baby.birthday
     return render_template('editbaby.html', form=form)
 
-
+@app.route('/editHealthy/<int:id>', methods=['GET', 'POST'])
+@login_required  # 登录保护
+def editHealthy(id):
+    form = EditHealthyForm()
+    healthy = Healthy.query.get(id)
+    if form.validate_on_submit():
+        healthy.height = form.height.data
+        healthy.weight = form.weight.data
+        healthy.create_time = form.create_time.data
+        db.session.commit()
+        flash('数据修改成功！')
+        return render_template('editHealthy.html', form=form)  # 重定向回首页
+    form.height.data = healthy.height
+    form.weight.data = healthy.weight
+    form.create_time.data = healthy.create_time
+    return render_template('editHealthy.html', form=form)
 
 
 

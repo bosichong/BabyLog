@@ -44,5 +44,11 @@ def forge(count):
         blog.baby_id = 1
         blog.user_id = 1
         db.session.add(blog)
-
+    click.echo("创建{}条随机的baby身高体重记录。".format(3))
+    for i in range(3):
+        healthy = Healthy()
+        healthy.height = 10+i
+        healthy.weight = 50+i
+        healthy.baby_id = 1
+        db.session.add(healthy)
     db.session.commit()

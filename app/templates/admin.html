@@ -6,7 +6,7 @@ block title %}BabyLog 管理页 {% endblock %} {% block content %}
   {% if current_user.is_authenticated %} {% if current_user.gm >= 5 %}
   <a href="{{ url_for('addUser') }}" target="_blank" rel="noopener noreferrer"
     >添加用户（用来记录日志的父母亲属）</a>
-  | <a href="{{ url_for('addBaby') }}" rel="noopener noreferrer">添加baby</a>
+  | <a href="#" rel="noopener noreferrer">添加baby</a>
   <hr />
 <h3>用户资料管理</h3>
   <table class="table table-bordered">

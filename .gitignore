@@ -104,6 +104,8 @@ venv.bak/
 .mypy_cache/
 
 # Development
+babylog.db
+data.db
 *.db
 .idea
 /uploads

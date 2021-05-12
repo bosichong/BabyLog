@@ -28,6 +28,7 @@ else:
 
 # 数据库设置
 dev_db = prefix + os.path.join(os.path.dirname(app.root_path), 'data.db')
+# dev_db = prefix + os.path.join(os.path.dirname(app.root_path), 'babylog.db')
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URI', dev_db)
 

@@ -1,20 +1,16 @@
 {% extends 'base.html' %}
 {% from 'bootstrap/form.html' import render_form %}
-{% block title %}BabyLog 添加Baby {% endblock %}
+{% block title %}BabyLog 添加用户父母亲属用来记录日志 {% endblock %}
 {% block content %}
 
 <div class="jumbotron">
 
 
 
-    <div class="babyform">
+    <div class="userform">
         {{ render_form(form, action=request.full_path) }}
     </div>
 
-    {{ super() }}
-    {{ ckeditor.load() }}
-    <!-- <script type="text/javascript" src="{{ url_for('static', filename='ckeditor/ckeditor.js') }}"></script> -->
-    {{ ckeditor.config(name='blog') }}
 
 
     {% for message in get_flashed_messages() %}

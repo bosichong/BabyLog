@@ -158,15 +158,48 @@ def addHealthy():
     return render_template('addHealthy.html', form=form)
 
 
+
+
+###################################
+#用户密码及资料修改
+###################################
+@app.route('/admin')
+def adminindex():
+    users = User.query.all()
+    babys = Baby.query.all()
+    return render_template('admin.html',users= users,babys=babys,)
+
+@app.route('/adduser', methods=['GET', 'POST'])
+@login_required  
+def addUser():
+    form = UserForm()
+    if form.validate_on_submit():
+        if isUserNameOk(form.username.data):
+            flash('名字重复，请换个名称！')
+            return render_template('edituser.html',form=form)
+        user = User()
+        user.username = form.username.data
+        if form.password.data:
+            user.set_password(form.password.data)
+        user.familymembers =form.familymembers.data
+        user.gm = form.gm.data
+        db.session.add(user)
+        db.session.commit()
+        flash(('数据修改成功！'))
+        return render_template('edituser.html',form=form)
+    return render_template('edituser.html',form=form)
+
 @app.route('/addbaby', methods=['GET', 'POST'])
 @login_required  # 登录保护
 def addBaby():
     form = BabyForm()
     if form.validate_on_submit():
+        if isBabyNameOk(form.name.data):
+            flash('名字重复，请换个名称！')
+            return render_template('addbaby.html', form=form)
         baby = Baby()
         baby.name = form.name.data
         baby.birthday = form.birthday.data
-        # baby.id = 2
         db.session.add(baby)
         db.session.commit()
         form.name.data = ''
@@ -175,7 +208,57 @@ def addBaby():
         return render_template('addbaby.html', form=form)  # 重定向回首页
     return render_template('addbaby.html', form=form)
 
+@app.route('/edituser/<int:id>', methods=['GET', 'POST'])
+@login_required  
+def editUser(id):
+    form = EditUserForm()
+    user = User.query.get(id)
+    if form.validate_on_submit():
+        if isUserNameOk(form.username.data):
+            flash('名字重复，请换个名称！')
+            return render_template('edituser.html',form=form)
+        user.username = form.username.data
+        if form.password.data:
+            user.set_password(form.password.data)
+        user.familymembers =form.familymembers.data
+        user.gm = form.gm.data
+        db.session.commit()
+        flash(('数据修改成功！'))
+        return render_template('edituser.html',form=form)
+    form.username.data = user.username
+    form.password.data =''
+    form.familymembers.data = user.familymembers
+    form.gm.data = user.gm
+    return render_template('edituser.html',form=form)
 
+@app.route('/editbaby/<int:id>', methods=['GET', 'POST'])
+@login_required  # 登录保护
+def editBaby(id):
+    form = BabyForm()
+    # form.submit.value="修改数据"
+    baby = Baby.query.get(id)
+    if form.validate_on_submit():
+        if isBabyNameOk(form.name.data):
+            flash('名字重复，请换个名称！')
+            return render_template('editbaby.html', form=form)  # 重定向回首页
+        baby.name = form.name.data
+        baby.birthday = form.birthday.data
+        db.session.commit()
+        flash('数据修改成功！')
+        return render_template('editbaby.html', form=form)  # 重定向回首页
+    form.name.data = baby.name
+    form.birthday.data= baby.birthday
+    return render_template('editbaby.html', form=form)
+
+
+
+
+
+
+
+
+###################################
+#登录及图片上传
 ###################################
 
 
@@ -235,3 +318,17 @@ def upload():
     #这里可以修改filename目录为时间目录
     url = url_for('uploaded_files', filename=f.filename)
     return upload_success(url, f.filename)  # 返回upload_success调用
+
+
+
+
+def isUserNameOk(username):
+    '''判断用户名是否重复'''
+    return User.query.filter_by(username = username).first()
+
+def isBabyNameOk(name):
+    '''判断baby name是否重复'''
+    print
+    return Baby.query.filter_by(name = name).first()
+
+

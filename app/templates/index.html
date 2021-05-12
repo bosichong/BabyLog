@@ -11,7 +11,7 @@
               <small class="text-muted sub-title">记录点滴</small>
           </h1> -->
       {% for baby in babydata %}
-      <!-- 暂时不输出露西 -->
+      <!-- 暂时不输出多孩儿数据 -->
         {% if baby[5] == 1 %}
         <h3 class="text-success">Baby:{{ baby[0] }}</h3>
         <p>出生于:{{ baby[1] }}，年龄:{{ baby[2] }}，您的孩子已经出生{{ baby[3] }}天了。 系统中共有{{ baby[4] }}

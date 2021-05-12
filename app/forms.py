@@ -23,7 +23,7 @@ class HealthyForm(FlaskForm):
 class BabyForm(FlaskForm):
     name = StringField('姓名:',validators=[DataRequired()])
     birthday = DateField('生日:',validators=[DataRequired()])
-    submit = SubmitField('添加数据')
+    submit = SubmitField('submit')
 
 class SearchForm(FlaskForm):
     key = StringField('',validators=[DataRequired()])
@@ -33,3 +33,17 @@ class LoginForm(FlaskForm):
     username = StringField('Username:',validators=[DataRequired()])
     password = PasswordField('Password:',validators=[DataRequired()])
     submit = SubmitField('登录')
+
+class UserForm(FlaskForm):
+    username = StringField('用户名称:',validators=[DataRequired()])
+    password = PasswordField('用户密码:',validators=[DataRequired()])
+    familymembers = StringField('成员关系:',validators=[DataRequired()])
+    gm = IntegerField("管理等级:",validators=[DataRequired()])
+    submit = SubmitField('submit')
+
+class EditUserForm(FlaskForm):
+    username = StringField('用户名称:',validators=[DataRequired()])
+    password = PasswordField('用户密码:',)
+    familymembers = StringField('成员关系:',validators=[DataRequired()])
+    gm = IntegerField("管理等级:",validators=[DataRequired()])
+    submit = SubmitField('submit')

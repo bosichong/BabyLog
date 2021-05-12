@@ -7,8 +7,9 @@ from app.models import *  #引入所有model
 
 
 @app.cli.command()
-def test():
-    click.echo("test!!")
+@click.option('--str',default='我来试试',help='这是一个帮助')
+def test(str):
+    click.echo(str)
 
 
 @app.cli.command()

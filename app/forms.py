@@ -3,7 +3,7 @@
 from flask_wtf import FlaskForm
 from flask_ckeditor import CKEditorField
 from wtforms import StringField, SubmitField, SelectField, TextAreaField, ValidationError, HiddenField, \
-    BooleanField, PasswordField,IntegerField, DateField
+    BooleanField, PasswordField,IntegerField,FloatField, DateField
 from wtforms.validators import DataRequired, Email, Length, Optional, URL
 
 
@@ -17,12 +17,12 @@ class BlogForm(FlaskForm):
 
 class HealthyForm(FlaskForm):
     height = IntegerField('身高：',validators=[DataRequired()])
-    weight = IntegerField('体重：',validators=[DataRequired()])
+    weight = FloatField('体重：',validators=[DataRequired()])
     submit = SubmitField('添加数据')
 
 class EditHealthyForm(FlaskForm):
     height = IntegerField('身高：',validators=[DataRequired()])
-    weight = IntegerField('体重：',validators=[DataRequired()])
+    weight = FloatField('体重：',validators=[DataRequired()])
     create_time = DateField('日期:',validators=[DataRequired()])
     submit = SubmitField('添加数据')
 

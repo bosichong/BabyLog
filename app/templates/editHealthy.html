@@ -10,10 +10,6 @@
         {{ render_form(form, action=request.full_path) }}
     </div>
 
-    {{ super() }}
-    {{ ckeditor.load() }}
-    <!-- <script type="text/javascript" src="{{ url_for('static', filename='ckeditor/ckeditor.js') }}"></script> -->
-    {{ ckeditor.config(name='blog') }}
 
 
     {% for message in get_flashed_messages() %}

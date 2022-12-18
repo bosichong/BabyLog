@@ -13,11 +13,11 @@ python交流学习群号:217840699
 """
 
 from sqlalchemy.orm import Session
-from models import User, CasbinAction, CasbinObject, Role, CasbinRule
+from models import User, CasbinAction, CasbinObject, Role, CasbinRule, Baby, Blog, Healthy, Photo
 from utils import verify_password, get_password_hash
 from utils import logger
 
-import random
+import random, datetime
 
 
 def create_data(db: Session):
@@ -29,8 +29,8 @@ def create_data(db: Session):
 
     # 创建超级管理员
     hashed_password = get_password_hash('123456')
-    if not get_user_by_username(db, "miniadmin"):
-        add_user(db, User(username='miniadmin', hashed_password=hashed_password, email='admin@example.com', remark='超级管理员，拥有所有权限'))
+    if get_users_count(db) == 0:
+        add_user(db, User(username='miniadmin', hashed_password=hashed_password, familymember='爸爸'))
         logger.info("创建超级管理员：miniadmin")
     user = get_user_by_username(db, "miniadmin")
 
@@ -58,6 +58,10 @@ def create_data(db: Session):
             CasbinObject(name='角色管理:', object_key='Role', description='Role--角色相关权限', user=user, ),
             CasbinObject(name='资源管理:', object_key='CasbinObject', description='CasbinObject--资源相关权限', user=user, ),
             CasbinObject(name='动作管理:', object_key='CasbinAction', description='CasbinAction表--动作相关权限', user=user, ),
+            CasbinObject(name='baby管理:', object_key='Baby', description='Baby--相关权限', user=user, ),
+            CasbinObject(name='图片管理:', object_key='Photo', description='Photo--相关权限', user=user, ),
+            CasbinObject(name='blog管理:', object_key='Blog', description='Blog--相关权限', user=user, ),
+            CasbinObject(name='健康管理:', object_key='Healthy', description='Healthy--相关权限', user=user, ),
         ]
         add_casbin_objects(db, cos)
 
@@ -67,8 +71,12 @@ def create_data(db: Session):
         logger.info("设置超级管理员")
         role_superadmin = get_role_by_id(db, 1)  # 超级管理员组
         create_casbin_rule_g(db, CasbinRule(ptype='g', v0=user.username, v1=role_superadmin.role_key))
-        logger.info("生成一些普通用户。")
-        create_temp_users(db)
+        # logger.info("生成一些普通用户。")
+        # create_temp_users(db)
+
+    if get_baby_count(db) == 0:
+        logger.info('创建两个baby')
+        create_babys(db)
 
 
 def set_user_role(db: Session):
@@ -119,7 +127,122 @@ def create_temp_users(db: Session):
             create_casbin_rule_g(db, CasbinRule(ptype='g', v0=user.username, v1=role_user.role_key))
 
 
-def create_user(db: Session, username: str, password: str, sex: str, email: str):
+def create_babys(db: Session):
+    create_baby(db, 'yaoyao', datetime.date(2012, 3, 22))
+    create_baby(db, 'luxi', datetime.date(2012, 4, 12))
+
+
+######################################
+# Baby
+######################################
+
+def create_baby(db: Session, name: str, birthday: datetime.date):
+    baby = Baby()
+    baby.name = name
+    baby.birthday = birthday
+    db.add(baby)
+    db.commit()
+
+
+def get_baby_count(db: Session):
+    return db.query(Baby).count()
+
+
+def get_babys(db: Session):
+    return db.query(Baby).all()
+
+
+def get_baby_by_id(db: Session, id: int):
+    return db.query(Baby).filter_by(id=id).first()
+
+
+######################################
+# blog
+######################################
+
+def create_blog(db: Session, content: str, user_id: int, babys: list[Baby]):
+    try:
+        blog = Blog()
+        blog.blog = content
+        blog.user_id = user_id
+        for baby in babys:
+            blog.babys.append(baby)
+        db.add(blog)
+        db.commit()
+        return blog
+    except Exception as e:
+        return False
+
+
+def get_blog_count(db: Session):
+    return db.query(Blog).count()
+
+
+def get_blog_by_id(db: Session, id: int):
+    return db.query(Blog).filter_by(id=id).first()
+
+
+######################################
+# Photo
+######################################
+
+
+def get_photos(db: Session):
+    return db.query(Photo).all()
+
+
+def get_photo_by_id(db: Session, id: int):
+    return db.query(Photo).filter_by(id=id).first()
+
+
+def get_photo_count(db: Session):
+    return db.query(Photo).count()
+
+
+def create_photo(db: Session, url: str, user_id: int, blog_id: int):
+    try:
+        db.add(Photo(url=url, user_id=user_id, blog_id=blog_id))
+        db.commit()
+        return True
+    except Exception as e:
+        return False
+
+
+######################################
+# Healthy
+######################################
+
+
+def get_healthys(db: Session):
+    return db.query(Healthy).all()
+
+
+def get_healthy_by_id(db: Session, id: int):
+    return db.query(Healthy).filter_by(id=id)
+
+
+def get_healthy_count(db: Session):
+    return db.query(Healthy).count()
+
+
+def create_healthy(db: Session, height: int, weight: float,baby_id:int):
+    hl = Healthy()
+    hl.height = height
+    hl.weight = weight
+    hl.baby_id = baby_id
+    try:
+        db.add(hl)
+        db.commit()
+        return True
+    except Exception as e :
+        return False
+
+
+######################################
+# User
+######################################
+
+def create_user(db: Session, username: str, password: str, familymember: str):
     """
     创建一个新用户
     :param db:
@@ -134,8 +257,7 @@ def create_user(db: Session, username: str, password: str, sex: str, email: str)
     user = User()
     user.username = username
     user.hashed_password = hashed_password
-    user.email = email
-    user.sex = sex
+    user.familymember = familymember
     user = add_user(db, user)
     create_casbin_rule_g(db, CasbinRule(ptype='g', v0=user.username, v1=role_user.role_key))  # 添加普通用户权限
     return True

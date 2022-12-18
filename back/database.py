@@ -21,7 +21,6 @@ from casbin_sqlalchemy_adapter import Adapter
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(BASE_DIR)
 
-
 # 创建一个使用内存的SQLite数据库 pytest专用。
 SQLALCHEMY_DATABASE_MEMORY = "sqlite+pysqlite:///:memory:"
 engine_test = create_engine(SQLALCHEMY_DATABASE_MEMORY, echo=False, )
@@ -42,7 +41,7 @@ def get_db_to_T_E_S_T():
 
 
 # 组装数据库的绝对地址
-DB_DIR = os.path.join(BASE_DIR, 'miniadmin_data.db')
+DB_DIR = os.path.join(BASE_DIR, 'babylog_data.db')
 # 数据库访问地址
 SQLALCHEMY_DATABASE_URL = "sqlite:///" + DB_DIR
 # 创建物理SQLite数据库

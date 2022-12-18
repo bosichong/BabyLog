@@ -26,20 +26,18 @@ class UserBase(BaseModel):
     email: str
 
 
-class UserCreate(UserBase):
+class UserCreate(BaseModel):
     username: str
     password: str
-    sex: str
+    familymember:str
 
 
 class User(UserBase):
     id: int
     username: str
     sex: str
-    email: str
     is_active: bool
     avatar: Union[str, None] = None
-    remark: Union[str, None] = None
 
     class Config:
         orm_mode = True
@@ -50,9 +48,7 @@ class UserUpdate(BaseModel):
     username: str
     password: Union[str, None] = ''
     sex: str
-    email: str
     avatar: Union[str, None] = None
-    remark: Union[str, None] = None
 
 
 class Users(BaseModel):

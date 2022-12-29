@@ -347,7 +347,6 @@ def isUserNameOk(username):
 
 def isBabyNameOk(name):
     '''判断baby name是否重复'''
-    print
     return Baby.query.filter_by(name = name).first()
 
 

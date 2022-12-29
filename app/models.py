@@ -31,7 +31,7 @@ class User(db.Model, UserMixin):
     blogs = db.relationship('Blog', backref='user', lazy='dynamic')
 
     def set_password(self, password):  # 用来设置密码的方法，接受密码作为参数
-        self.password = generate_password_hash(password)  # 将生成的密码保持到对应字段
+        self.password = generate_password_hash(password)  # 将生成的密码保存到对应字段
 
     def validate_password(self, password):  # 用于验证密码的方法，接受密码作为参数
         return check_password_hash(self.password, password)  # 返回布尔值

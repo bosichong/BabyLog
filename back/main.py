@@ -79,7 +79,7 @@ def main():
     '''
     html_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'dist', 'index.html')
     html_content = ''
-    with open(html_path) as f:
+    with open(html_path, encoding="utf-8") as f:
         html_content = f.read()
     return HTMLResponse(content=html_content, status_code=200)
 

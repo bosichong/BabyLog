@@ -199,6 +199,16 @@ def get_blogs_count_by_keyword(db: Session, keyword: str):
     return db.query(Blog).filter(Blog.blog.like("%" + keyword + "%")).count()
 
 
+def get_old_by_month_day_data(db: Session):
+    '''
+    return 那年今天的数据
+    '''
+    return db.query(Blog).filter(func.strftime('%m-%d', Blog.create_time) == func.strftime('%m-%d', datetime.datetime.utcnow()),
+                                 func.strftime('%Y', Blog.create_time) !=
+                                 func.strftime('%Y', datetime.datetime.utcnow()), Blog.create_time < datetime.datetime.utcnow()).all()
+
+
+
 def _get_blogs(db: Session):
     return db.query(Blog).all()
 

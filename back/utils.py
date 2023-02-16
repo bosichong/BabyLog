@@ -2,7 +2,7 @@
 Author: J.sky bosichong@qq.com
 Date: 2022-11-22 09:03:48
 LastEditors: J.sky bosichong@qq.com
-LastEditTime: 2022-11-27 10:06:04
+LastEditTime: 2023-02-16 15:54:55
 FilePath: /MiniAdmin/back/utils.py
 工具类,密码、验证、权限验证等
 python交流学习群号:217840699
@@ -11,6 +11,7 @@ python交流学习群号:217840699
 import os
 import sys
 import datetime,time
+import zipfile
 from functools import wraps
 
 from passlib.context import CryptContext
@@ -143,3 +144,23 @@ def caltime(date1, date2):
     # 返回两个变量相差的值，就是相差天数
     # print((date2-date1).days)#将天数转成int型
     return(date2-date1).days
+
+
+# 函数名：zip_dir
+# 传入参数：源目录、打包文件路径
+def zip_dir(source_dir, output_filename):
+    zf = zipfile.ZipFile(output_filename, "w", compression=zipfile.ZIP_DEFLATED)
+    abs_src = os.path.abspath(source_dir)
+
+    for dirname, subdirs, files in os.walk(source_dir):
+        for filename in files:
+            absname = os.path.abspath(os.path.join(dirname, filename))
+
+            arcname = absname[len(abs_src) + 1:]
+
+            # print 'zipping %s as %s' % (os.path.join(sourceDirName, file), arcname)
+
+            zf.write(absname, arcname)
+
+    zf.close()
+    return True

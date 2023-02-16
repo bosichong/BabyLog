@@ -108,3 +108,4 @@ data.db
 *.db
 .idea
 /uploads
+*.zip

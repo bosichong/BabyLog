@@ -20,7 +20,7 @@ from jose import JWTError, jwt
 import crud, schemas, models
 from database import get_db, get_casbin_e, BASE_DIR
 from schemas import Token, TokenData
-from utils import verify_password, APP_TOKEN_CONFIG, oauth2_scheme, get_username_by_token, get_password_hash, verify_enforce, logger, caltime
+from utils import verify_password, APP_TOKEN_CONFIG, oauth2_scheme, get_username_by_token, get_password_hash, verify_enforce, zip_dir, caltime
 
 # 相册
 PHOTO_PATH = os.path.join(BASE_DIR, 'uploads')
@@ -115,6 +115,15 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     return {"access_token": access_token, "token_type": "bearer"}
 
 
+@router.get('/back_zip')
+def back_zip(token: str = Depends(oauth2_scheme)):
+    cwd = os.getcwd()
+    source_dir = os.path.abspath(os.path.join(cwd, os.pardir))  # 获得上一层目录地址
+    output_filename = os.path.join(source_dir, 'baby_back.zip')  # 打包后的文件名
+    return zip_dir(source_dir,output_filename)
+
+
+
 ######################################
 # Blog相关的api接口
 ######################################
@@ -161,20 +170,7 @@ async def get_ecdata(token: str = Depends(oauth2_scheme), db: Session = Depends(
 
 @router.get('/blog/get_old_blogs')
 async def get_main_old_blogs(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    y = datetime.now().strftime("%Y")  # 现在的年份
-    m = datetime.now().strftime("%m")  # 现在的月份
-    d = datetime.now().strftime("%d")  # 现在的日期
-    # d = '13' # 测试的日期
-    bs = crud._get_blogs(db)
-    oldblogs = []
-    for blog in bs:
-        year = blog.create_time.year
-        month = blog.create_time.month
-        day = blog.create_time.day
-        # print(day,int(d))
-        if day == int(d) and month == int(m) and year != int(y):
-            oldblogs.append(blog)
-    # print(oldblogs)
+    oldblogs = crud.get_old_by_month_day_data(db)
     blogs = []
     for b in oldblogs:
         # print(b.blog,b.photos)

@@ -2,7 +2,7 @@
  * @Author: J.sky bosichong@qq.com
  * @Date: 2022-12-19 23:21:13
  * @LastEditors: J.sky bosichong@qq.com
- * @LastEditTime: 2022-12-29 09:54:44
+ * @LastEditTime: 2023-02-25 08:54:32
  * @FilePath: /BabyLog/front/src/components/blog/AddBlog.vue
 -->
 <template lang="">
@@ -138,7 +138,6 @@ const onSubmit = (() => {
                 content: '添加成功!',
                 onOk: () => {
                     fileList.value = [];
-                    formBlog.babys = [['yaoyao', 'luxi'], []],
                     formBlog.blog = ''
                 }
             })

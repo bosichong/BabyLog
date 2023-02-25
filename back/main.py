@@ -2,7 +2,7 @@
 Author: J.sky bosichong@qq.com
 Date: 2022-11-21 09:16:37
 LastEditors: J.sky bosichong@qq.com
-LastEditTime: 2022-11-21 09:44:08
+LastEditTime: 2023-02-25 08:53:30
 FilePath: /MiniAdmin/back/main.py
 MiniAdmin,一个简洁轻快的后台管理框架
 '''
@@ -25,7 +25,7 @@ import crud
 from fastapi.responses import HTMLResponse  # 响应html
 from fastapi.staticfiles import StaticFiles  # 设置静态目录
 
-__version__ = "0.1.0"
+__version__ = "2.0.2"
 description = '''Mini Admin,一个简洁轻快的后台管理框架.支持拥有多用户组的RBAC管理后台 🚀'''
 
 app = FastAPI(

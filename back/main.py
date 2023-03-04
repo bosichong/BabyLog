@@ -25,7 +25,7 @@ import crud
 from fastapi.responses import HTMLResponse  # 响应html
 from fastapi.staticfiles import StaticFiles  # 设置静态目录
 
-__version__ = "2.0.2"
+__version__ = "2.0.3"
 description = '''Mini Admin,一个简洁轻快的后台管理框架.支持拥有多用户组的RBAC管理后台 🚀'''
 
 app = FastAPI(

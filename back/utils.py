@@ -10,7 +10,7 @@ python交流学习群号:217840699
 
 import os
 import sys
-import datetime,time
+import datetime, time
 import zipfile
 from functools import wraps
 
@@ -129,7 +129,6 @@ def get_username_by_token(token):
         raise credentials_exception
 
 
-
 def caltime(date1, date2):
     '''
     返回两个日期之间的间隔天数
@@ -143,7 +142,7 @@ def caltime(date1, date2):
     date2 = datetime.datetime(date2[0], date2[1], date2[2])
     # 返回两个变量相差的值，就是相差天数
     # print((date2-date1).days)#将天数转成int型
-    return(date2-date1).days
+    return (date2 - date1).days
 
 
 # 函数名：zip_dir
@@ -164,3 +163,30 @@ def zip_dir(source_dir, output_filename):
 
     zf.close()
     return True
+
+
+import copy
+
+
+def update_array(original_array, parameters):
+    '''
+    拼装前端权限管理展示数据
+    :param original_array:
+    :param parameters:
+    :return:
+    '''
+    result = copy.deepcopy(original_array)
+
+    for parameter in parameters:
+        # print(parameter)
+        if len(parameter) <= 0:
+            break
+        for original in result:
+            if parameter[0] == original[0]:
+                result[result.index(original)] = parameter
+                break
+    for original in result:
+        if original not in parameters:
+            result[result.index(original)] = []
+
+    return result

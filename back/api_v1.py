@@ -20,7 +20,8 @@ from jose import JWTError, jwt
 import crud, schemas, models
 from database import get_db, get_casbin_e, BASE_DIR
 from schemas import Token, TokenData
-from utils import verify_password, APP_TOKEN_CONFIG, oauth2_scheme, get_username_by_token, get_password_hash, verify_enforce, zip_dir, caltime
+from utils import verify_password, APP_TOKEN_CONFIG, oauth2_scheme, get_username_by_token,\
+    get_password_hash, verify_enforce, zip_dir, caltime,update_array
 
 # 相册
 PHOTO_PATH = os.path.join(BASE_DIR, 'uploads')
@@ -847,7 +848,7 @@ async def get_co_ca(role_id: int, token: str = Depends(oauth2_scheme), db: Sessi
             # print(temp_nams)
     checkeds.append(temp_nams)
     # print(checkeds)
-    return {'options': all_co_ca, 'checkeds': checkeds}
+    return {'options': all_co_ca, 'checkeds': update_array(all_co_ca,checkeds)}
 
 
 @router.post('/role/change_role')

@@ -190,3 +190,15 @@ def update_array(original_array, parameters):
             result[result.index(original)] = []
 
     return result
+
+
+def create_directory(dir_path):
+    """
+    判断目录是否存在，不存在则创建
+    :param dir_path: 目录路径
+    """
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+        print(f"创建目录 {dir_path} 成功")
+    else:
+        print(f"目录 {dir_path} 已存在")

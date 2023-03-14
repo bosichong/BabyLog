@@ -9,6 +9,8 @@ MiniAdmin,一个简洁轻快的后台管理框架
 
 import os
 import sys
+from utils import create_directory
+
 
 # 将当前目录添加到系统变量中
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -58,6 +60,8 @@ app.add_middleware(
 )
 
 app.include_router(router)
+
+create_directory("uploads")
 
 # 静态资源
 app.mount("/dist", StaticFiles(directory=os.path.join(BASE_DIR, 'dist')), name="dist")

@@ -5,7 +5,7 @@
  * @LastEditTime: 2022-12-26 09:04:30
  * @FilePath: /MiniAdmin/front/src/router/index.js
  */
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import axios from 'axios'
 
 
@@ -205,7 +205,7 @@ const routes = [
 
 
 const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHashHistory(),
     routes,
 });
 

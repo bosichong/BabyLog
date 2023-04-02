@@ -14,8 +14,10 @@
       </div>
       </a-card>  
 
+        <div v-for="(item, index) in babysdata">
         <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
-        <div id="main"  style="width:100%;height:400px;"></div>
+        <div :id="'main'+index"  style="width:100%;height:400px;"></div>
+        </div>
 
 
       <a-list :grid="{ gutter: 24, column: 1 }"  size="large" :data-source="blogs">
@@ -86,37 +88,36 @@ openList()
 
 onMounted(() => {
 
-
-
     axios.get('/v1/blog/get_ecdata').then(function (res) {
-        let chartDom = document.getElementById('main');
-        let myChart = echarts.init(chartDom);
-        let option;
+        const data  = res.data.data
+        // console.log(data);
+        for (let index = 0; index < data.length; index++) {
+            const element = data[index];
+            // console.log(element);
+            let chart_id = "main"+index;
+            let chartDom = document.getElementById(chart_id);
+            let myChart = echarts.init(chartDom);
+            let option;
 
-        option = {
-            tooltip: {
-                trigger: 'axis'
-            },
-            legend: {
-                data: res.data.legend_data
-            },
-            xAxis: {
-                type: 'category',
-                data: res.data.times
-            },
-            yAxis: {
-                type: 'value'
-            },
-            series: res.data.series
-        };
-
-        option && myChart.setOption(option);
-
-
+            option = {
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data: element.legend_data
+                },
+                xAxis: {
+                    type: 'category',
+                    data: element.times
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: element.series
+            };
+            option && myChart.setOption(option);
+        }
     })
-
-
-
 
 })
 

@@ -130,28 +130,22 @@ def back_zip(token: str = Depends(oauth2_scheme)):
 ######################################
 @router.get('/blog/get_ecdata')
 async def get_ecdata(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    hs = crud.get_healthys1(db)
-    times = []
-    for h in hs:
-        i = h.create_time
-        times.append("%s-%s-%s" % (i.year, i.month, i.day))
     babys = crud.get_babys(db)
-
-    legend_data = []
-    series = []
+    data = []
     for baby in babys:
+        legend_data = []
+        series = []
+        times = []
         legend_data.append(baby.name + '身高(厘米)')
         legend_data.append(baby.name + '体重(公斤)')
-        # hs = crud.get_healthys_by_babyid(db, baby.id)
+        hs = crud.get_healthys_by_babyid(db, baby.id)
         heights = []
         weights = []
         for h in hs:
-            if baby.id == h.baby.id:
-                heights.append(h.height)
-                weights.append(h.weight)
-            else:
-                heights.append('-')
-                weights.append('-')
+            heights.append(h.height)
+            weights.append(h.weight)
+            i = h.create_time
+            times.append("%s-%s-%s" % (i.year, i.month, i.day))
         series.append({
             'data':  heights,
             'type':  'line',
@@ -164,9 +158,9 @@ async def get_ecdata(token: str = Depends(oauth2_scheme), db: Session = Depends(
             'name':  baby.name + '体重(公斤)',
             'stack': '总量',
         })
-
-    # print(legend_data)
-    return {'times': times, 'legend_data': legend_data, 'series': series}
+        data.append({"legend_data": legend_data, "series": series, "times": times})
+    print(data)
+    return {"data": data}
 
 
 @router.get('/blog/get_old_blogs')

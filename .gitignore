@@ -36,6 +36,10 @@ ENV/
 *.sublime-workspace
 *.sublime-project
 
+# 图片库
+
+express_back/uploads/
+
 
 
 
@@ -68,3 +72,4 @@ coverage
 *.njsproj
 *.sln
 *.sw?
+*.zip

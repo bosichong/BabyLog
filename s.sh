@@ -1,1 +1,0 @@
-python ./back/main.py

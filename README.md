@@ -1,82 +1,64 @@
-## Mini Admin
 
-Mini Admin,一个简洁轻快的后台管理框架.支持拥有多用户组的RBAC管理后台 🚀
+# BabyLog 2.0
 
-应用场景：2-5人的管理团队，需要管理的资源数目10个或是更少，如果想有一个简单轻快直接的后台管理，下载下来就可以使用，
-不要配置各种运行环境，不要搭建各种服务器端的主机配置，就是想拿来就用！ 那么你就试试咱的MiniAdmin。
+岁月如风，唯有此忆, 任凭时光匆匆，记录点点滴滴。 
+
+一晃10年都过去了,当初孩子出生的时候,我只是想记录一下一些当爸爸的心路历程,没想到一下子就过去了10年.
+
+此间,程序重构过多次,但是唯一不变的就是那些记录下来的数据和相片.
+
+全新的BabyLog2.0 发布了!
+
+![输入图片说明](./imgs/001.png "首页预览")
+
+
+## 程序介绍
+
+本程序在miniadmin框架的基础之上继续开发的.
+技术栈:fastAPI、vue3、antDesign等
+
+BabyLog是用来记录孩子成长过程的日记，那年今天,全文搜索等功能，还包括身高，体重，并使用图表展示,2.0系统支持多个宝贝.支持多位家长亲属共同记录.
+
+
+## 界面预览
+
+首页有一些孩子相关记录及那年今天的回忆类似QQ空间的那年今天
+
+![输入图片说明](./imgs/001.png)
+
+![输入图片说明](./imgs/002.png)
+
+![输入图片说明](./imgs/003.png)
+
+![输入图片说明](./imgs/004.png)
 
 
 
-### 安装 
 
-Git克隆或是下载压缩包。
+## 安装
 
-终端进入程序的根目录：
+1. git克隆或是下载压缩包。本程序测试环境为:`Python 3.10`,下载程序进入程序主目录，安装程序相关依赖，在程序根目录终端下运行：
 
-    pip install -r requirements.txt
+    pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/
 
-然后：
+然后:
 
     cd back
     python main.py
 
-![](img/01.png)
 
-Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
-
-初始的管理员：miniadmin 123456
+首次启动程序,会创建两个账号和两个宝宝,您可以根据需求进入后台管理进行数据的增删改.
+账号:baba或mama 密码:123456  二个账号都是超级管理权限.登陆后台可以修改资料或密码,修改宝宝的名字和生日等资料.
 
 
-效果图：
+## 写在最后
 
-![](img/04.png)
-![](img/03.png)
-![](img/02.png)
+这个程序自己真的是使用了好多年，历经几次的重构，从最开始的php原生代码到使用thinkPHP框架，后来有使用Java重构了一次（详见分支master），期间还用Python写了一个终端的录入版，而后使用了flask重构了一下，这次2.0版本使用前后端分离,这个程序使用也有10年多了，回头看看真是感慨万千，一方面是孩子的记录，一方面是自己学习的渣渣历程。
 
+真诚的希望有孩子的和打算生孩子的程序员们来一起维护这个程序，有些东西真的需要记下来，不然回头看去都是模糊的回忆。
 
-### 后端：
-
-    casbin==1.17.4
-    casbin_sqlalchemy_adapter==0.5.0
-    fastapi==0.88.0
-    jose==1.0.0
-    loguru==0.6.0
-    passlib==1.7.4
-    pydantic==1.10.2
-    pytest==7.1.2
-    python_jose==3.3.0
-    SQLAlchemy==1.4.39
-    uvicorn==0.20.0
-
-### 前端：
-
-    "ant-design-vue": "^3.2.15",
-    "axios": "^1.2.0",
-    "vue": "^3.2.45",
-    "vue-router": "^4.1.6"
-
-
-### 数据库ER图：
-![](img/05.png)
-
-后台的安全校验是基于Casbin(一个支持如ACL, RBAC, ABAC等访问模型)的授权库。
-支持拥有多用户组的RBAC管理。具体可以登陆后台管理系统进行体验。
-理论上来说，稍加修改代码可以支持更多的访问模型
-https://docs.casbin.cn/zh/docs/supported-models
-
-
-### 感谢！
-
-https://docs.casbin.cn/zh/
-
-https://fastapi.tiangolo.com/zh/
-
-https://cn.vuejs.org/
-
-https://www.antdv.com/docs/vue/introduce-cn
-
-https://www.axios-http.cn/docs/intro
+任凭时光匆匆，记录点点滴滴。以上记录与2022-12-29
+   
 
 
 
-提出您的宝贵意见，程序刚刚跑起来问题难免，欢迎issue！

@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { FULL_API_BASE_URL, UPLOAD_CONFIG } from "@/lib/config";
 
 export default function EditBlogPage({ params: paramsPromise }) {
   const params = use(paramsPromise);
@@ -37,7 +38,7 @@ export default function EditBlogPage({ params: paramsPromise }) {
       for (const photo of photos) {
         if (!photo || !photo.file_path) continue;
         
-        await fetch("http://localhost:8887/v1/photos/delete_img", {
+        await fetch(`${FULL_API_BASE_URL}/photos/delete_img`, {
           method: "POST",
           headers: {
             'Content-Type': 'application/json',
@@ -123,7 +124,7 @@ export default function EditBlogPage({ params: paramsPromise }) {
         // 获取认证token
         const token = document.cookie.split('; ').find(row => row.startsWith('token=')).split('=')[1];
 
-        const response = await fetch("http://localhost:8887/v1/photos/uploadfile", {
+        const response = await fetch(`${FULL_API_BASE_URL}/photos/uploadfile`, {
           method: "POST",
           headers: {
             'Authorization': `Bearer ${token}`
@@ -233,7 +234,7 @@ export default function EditBlogPage({ params: paramsPromise }) {
                     <Dialog key={`dialog-${photo.id}`}>
                       <DialogTrigger className="w-full ">
                         <img
-                          src={`http://localhost:8887/uploads/${photo.file_path}`}
+                          src={UPLOAD_CONFIG.getFileUrl(photo.file_path)}
                           alt={photo.file_name}
                           className="w-full h-32 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
                         />
@@ -244,7 +245,7 @@ export default function EditBlogPage({ params: paramsPromise }) {
                           查看上传的图片大图，按ESC键关闭预览
                         </DialogDescription>
                         <img
-                          src={`http://localhost:8887/uploads/${photo.file_path}`}
+                          src={UPLOAD_CONFIG.getFileUrl(photo.file_path)}
                           alt={photo.file_name}
                           className="w-full h-auto max-h-[90vh] object-contain"
                         />

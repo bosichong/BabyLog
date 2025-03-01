@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import MainLayout from "@/components/layout/main-layout";
 import { babyAPI, blogAPI } from "@/lib/api";
+import { UPLOAD_CONFIG } from "@/lib/config";
 import GrowthChart from "@/components/health/GrowthChart";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -117,7 +118,7 @@ export default function Home() {
                                 <Dialog key={photo.id}>
                                   <DialogTrigger>
                                     <img
-                                      src={`http://localhost:8887/uploads/${photo.file_path}`}
+                                      src={UPLOAD_CONFIG.getFileUrl(photo.file_path)}
                                       alt={photo.file_name}
                                       className="w-full h-32 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
                                     />
@@ -128,7 +129,7 @@ export default function Home() {
                                       查看上传的图片大图，按ESC键关闭预览
                                     </DialogDescription>
                                     <img
-                                      src={`http://localhost:8887/uploads/${photo.file_path}`}
+                                      src={UPLOAD_CONFIG.getFileUrl(photo.file_path)}
                                       alt={photo.file_name}
                                       className="w-full h-auto max-h-[90vh] object-contain"
                                     />

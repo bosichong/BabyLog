@@ -231,6 +231,23 @@ export default function UsersPage() {
         </div>
       ),
     },
+    {
+      name: "is_active",
+      render: (values) => (
+        <div className="grid gap-2">
+          <Label htmlFor="is_active">账户状态</Label>
+          <select
+            id="is_active"
+            value={values.is_active ? "true" : "false"}
+            onChange={(e) => setUserFormData({ ...userFormData, is_active: e.target.value === "true" })}
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <option value="true">启用</option>
+            <option value="false">停用</option>
+          </select>
+        </div>
+      ),
+    },
   ];
 
   // 宝贝管理功能

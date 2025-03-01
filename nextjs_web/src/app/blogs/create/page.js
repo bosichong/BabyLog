@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import MainLayout from "@/components/layout/main-layout";
 import { babyAPI, blogAPI } from "@/lib/api";
+import { FULL_API_BASE_URL, UPLOAD_CONFIG } from "@/lib/config";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -56,7 +57,7 @@ export default function CreateBlogPage() {
         // 获取认证token
         const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
 
-        const response = await fetch("http://localhost:8887/v1/photos/uploadfile", {
+        const response = await fetch(`${FULL_API_BASE_URL}/photos/uploadfile`, {
           method: "POST",
           headers: {
             'Authorization': `Bearer ${token}`
@@ -90,7 +91,7 @@ export default function CreateBlogPage() {
       for (const photo of photos) {
         if (!photo || !photo.file_path) continue;
         
-        await fetch("http://localhost:8887/v1/photos/delete_img", {
+        await fetch(`${FULL_API_BASE_URL}/photos/delete_img`, {
           method: "POST",
           headers: {
             'Content-Type': 'application/json',
@@ -200,7 +201,7 @@ export default function CreateBlogPage() {
                   <Dialog key={`dialog-${photo.id || index}`}>
                     <DialogTrigger>
                       <img
-                        src={`http://localhost:8887/uploads/${photo.file_path}`}
+                        src={UPLOAD_CONFIG.getFileUrl(photo.file_path)}
                         alt={photo.file_name}
                         className="w-full h-32 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
                       />
@@ -211,7 +212,7 @@ export default function CreateBlogPage() {
                         查看上传的图片大图，按ESC键关闭预览
                       </DialogDescription>
                       <img
-                        src={`http://localhost:8887/uploads/${photo.file_path}`}
+                        src={UPLOAD_CONFIG.getFileUrl(photo.file_path)}
                         alt={photo.file_name}
                         className="w-full h-auto max-h-[90vh] object-contain"
                       />

@@ -8,7 +8,7 @@ const { verifyToken } = require('../middleware/auth');
 
 // 配置文件上传
 const PHOTO_PATH = path.join(__dirname, '../uploads');
-const PHOTO_URL = 'http://localhost:3000/uploads/';
+const PHOTO_URL = `${process.env.BASE_URL}/uploads/`;
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {

@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } 
 import { Pagination } from "@/components/ui/pagination";
 import { useToast } from "@/components/ui/use-toast";
 import { formatTimeAgo } from "@/lib/utils";
+import { UPLOAD_CONFIG } from "@/lib/config";
 
 export default function BlogsPage() {
   const { toast } = useToast();
@@ -133,7 +134,7 @@ export default function BlogsPage() {
                         <Dialog key={photo.id}>
                           <DialogTrigger>
                             <img
-                              src={`http://localhost:8887/uploads/${photo.file_path}`}
+                              src={UPLOAD_CONFIG.getFileUrl(photo.file_path)}
                               alt={photo.file_name}
                               className="w-full h-32 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
                             />
@@ -144,7 +145,7 @@ export default function BlogsPage() {
                               查看上传的图片大图，按ESC键关闭预览
                             </DialogDescription>
                             <img
-                              src={`http://localhost:8887/uploads/${photo.file_path}`}
+                              src={UPLOAD_CONFIG.getFileUrl(photo.file_path)}
                               alt={photo.file_name}
                               className="w-full h-auto max-h-[90vh] object-contain"
                             />

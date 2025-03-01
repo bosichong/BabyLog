@@ -1,15 +1,15 @@
-// 创建基础请求配置
-const BASE_URL = 'http://localhost:8887/v1';
+// 导入API配置
+import { FULL_API_BASE_URL, API_BASE_URL, UPLOAD_CONFIG } from './config';
 
 // 创建API请求函数
 const createApiRequest = (endpoint, method) => async (data = null) => {
   const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
 
-  console.log(`[API请求] ${method} ${BASE_URL}${endpoint}`);
+  console.log(`[API请求] ${method} ${FULL_API_BASE_URL}${endpoint}`);
   console.log('请求参数:', data);
   console.log('Token:', token ? '已设置' : '未设置');
 
-  let url = `${BASE_URL}${endpoint}`;
+  let url = `${FULL_API_BASE_URL}${endpoint}`;
   if (method === 'GET' && data) {
     const params = new URLSearchParams();
     Object.entries(data).forEach(([key, value]) => {
@@ -39,7 +39,7 @@ const createApiRequest = (endpoint, method) => async (data = null) => {
 
   try {
     console.log('%c[API请求]%c 开始发送请求', 'color: #4CAF50; font-weight: bold', 'color: black');
-    console.log('%c[URL]%c ' + `${BASE_URL}${endpoint}`, 'color: #2196F3; font-weight: bold', 'color: black');
+    console.log('%c[URL]%c ' + `${FULL_API_BASE_URL}${endpoint}`, 'color: #2196F3; font-weight: bold', 'color: black');
     console.log('%c[时间]%c ' + new Date().toISOString(), 'color: #9C27B0; font-weight: bold', 'color: black');
     
     // 添加超时检查
@@ -47,7 +47,7 @@ const createApiRequest = (endpoint, method) => async (data = null) => {
       setTimeout(() => reject(new Error('请求超时')), 10000);
     });
 
-    const fetchPromise = fetch(`${BASE_URL}${endpoint}`, config);
+    const fetchPromise = fetch(`${FULL_API_BASE_URL}${endpoint}`, config);
     const response = await Promise.race([fetchPromise, timeoutPromise]);
     
     console.log(`[${new Date().toISOString()}] 收到响应状态:`, response.status, response.statusText);
@@ -74,7 +74,7 @@ const createApiRequest = (endpoint, method) => async (data = null) => {
       // 尝试检查服务器连接
       console.log('正在检查服务器连接...');
       const networkError = { 
-        message: '网络连接失败，请确保：\n1. 服务器已启动\n2. 服务器地址配置正确 (当前地址: ' + BASE_URL + ')\n3. 网络连接正常'
+        message: '网络连接失败，请确保：\n1. 服务器已启动\n2. 服务器地址配置正确 (当前地址: ' + FULL_API_BASE_URL + ')\n3. 网络连接正常'
       };
       console.error('网络错误详情:', networkError);
       throw networkError;
@@ -120,7 +120,7 @@ export const userAPI = {
   getUserById: (id) => createApiRequest(`/users/${id}`, 'GET')(),
   createUser: createApiRequest('/users', 'POST'),
   updateUser: (params) => createApiRequest(`/users/${params.id}/update`, 'POST')(params),
-  deleteUser: (params) => createApiRequest(`/users/${params.id}`, 'DELETE')()
+  deleteUser: (params) => createApiRequest(`/users/${params.id}/delete`, 'POST')(),
 };
 
 // Baby API

@@ -3,6 +3,9 @@ const express = require('express');
 const cors = require('cors');
 const { Sequelize } = require('sequelize');
 const initModels = require('./models/init-models');
+const fs = require('fs');
+const path = require('path');
+const { hashPassword } = require('./middleware/auth');
 
 const app = express();
 
@@ -38,28 +41,74 @@ app.use((req, res, next) => {
   next();
 });
 
+// 确保uploads目录存在
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  console.log('创建uploads目录...');
+  fs.mkdirSync(uploadsDir, { recursive: true });
+  console.log('uploads目录创建成功');
+} else {
+  console.log('uploads目录已存在，无需创建');
+}
+
 // 配置静态文件目录
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // 数据库连接配置
 const sequelize = new Sequelize({
   dialect: 'sqlite',
-  storage: 'babylog_data.db',
+  storage: path.join(__dirname, 'babylog_data.db'),
   logging: false
 });
 
 // 初始化数据库模型
 const models = initModels(sequelize);
 
+// 创建默认管理员账户的函数
+async function createDefaultAdmin(models) {
+  try {
+    // 检查是否已存在任何用户
+    const userCount = await models.User.count();
+    if (userCount === 0) {
+      // 创建默认管理员账户
+      const hashedPassword = await hashPassword('123456');
+      await models.User.create({
+        username: 'admin',
+        hashed_password: hashedPassword,
+        familymember: '管理员',
+        sex: '男',
+        is_active: true // 默认激活状态
+      });
+      console.log('默认管理员账户创建成功');
+    } else {
+      console.log('系统中已存在用户，无需创建默认管理员');
+    }
+  } catch (error) {
+    console.error('创建默认管理员账户失败:', error);
+  }
+}
+
 // 测试数据库连接
 sequelize.authenticate()
   .then(() => {
     console.log('数据库连接成功');
-    // 同步数据库模型
-    return sequelize.sync();
+    // 检查数据库是否已存在表
+    return sequelize.getQueryInterface().showAllTables()
+      .then(tables => {
+        if (tables.length === 0) {
+          // 数据库为空，创建所有表
+          console.log('数据库为空，创建所有表...');
+          return sequelize.sync();
+        } else {
+          console.log('数据库已存在表，跳过同步过程...');
+          return Promise.resolve();
+        }
+      });
   })
   .then(() => {
     console.log('数据库模型同步成功');
+    // 创建默认管理员账户
+    return createDefaultAdmin(models);
   })
   .catch(err => {
     console.error('数据库连接或同步失败:', err);
@@ -102,7 +151,7 @@ app.use((err, req, res, next) => {
 });
 
 // 启动服务器
-const PORT = process.env.PORT || 8887;
+const PORT = process.env.PORT || 8888;
 app.listen(PORT, () => {
   console.log(`服务器运行在 http://localhost:${PORT}`);
 });

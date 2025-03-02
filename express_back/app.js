@@ -54,6 +54,8 @@ if (!fs.existsSync(uploadsDir)) {
 // 配置静态文件目录
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// 前端静态资源目录已移除
+
 // 数据库连接配置
 const sequelize = new Sequelize({
   dialect: 'sqlite',
@@ -138,7 +140,21 @@ app.use('/v1/healthies', healthyRouter);
 
 // 基础路由
 app.get('/', (req, res) => {
-  res.json({ message: 'BabyLog API 服务运行正常' });
+  res.json({
+    status: 'success',
+    message: 'BabyLog API服务正在运行'
+  });
+});
+
+// 处理404路由
+app.use((req, res, next) => {
+  if (!req.route) {
+    return res.status(404).json({
+      status: 'error',
+      message: '请求的API路径不存在'
+    });
+  }
+  next();
 });
 
 // 错误处理中间件

@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } 
 import { Pagination } from "@/components/ui/pagination";
 import { useToast } from "@/components/ui/use-toast";
 import { formatTimeAgo } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { UPLOAD_CONFIG } from "@/lib/config";
 
 export default function BlogsPage() {
@@ -104,7 +105,7 @@ export default function BlogsPage() {
                 <div className="border-b p-3">
                   <div className="flex justify-between items-center">
                     <div className="text-sm text-gray-500 text-left">
-                      {blog.user.familymember}:在 <span>{formatTimeAgo(blog.create_time)}前</span> 添加了一条{blog.babies && blog.babies.length > 0 ? `关于${blog.babies.map(baby => baby.name).join('、')}` : ''} 数据
+                      {blog.user.familymember}:在 <TooltipProvider><Tooltip><TooltipTrigger><span>{formatTimeAgo(blog.create_time)}前</span></TooltipTrigger><TooltipContent>{new Date(blog.create_time).getFullYear()}年{String(new Date(blog.create_time).getMonth() + 1).padStart(2, '0')}月{String(new Date(blog.create_time).getDate()).padStart(2, '0')}日</TooltipContent></Tooltip></TooltipProvider> 添加了一条{blog.babies && blog.babies.length > 0 ? `关于${blog.babies.map(baby => baby.name).join('、')}` : ''} 数据
                     </div>
                     <div className="flex gap-2">
                       <Button

@@ -1,10 +1,7 @@
 {
   "scripts": {
-    "start": "pm2 start ecosystem.config.js",
-    "stop": "pm2 stop ecosystem.config.js",
-    "restart": "pm2 restart ecosystem.config.js",
-    "status": "pm2 status",
-    "logs": "pm2 logs",
-    "delete": "pm2 delete ecosystem.config.js"
+    "start": "node start-no-pm2.js",
+    "dev": "node start-no-pm2.js --dev",
+    "build": "node build-frontend.js"
   }
 }

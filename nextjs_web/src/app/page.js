@@ -7,6 +7,8 @@ import { UPLOAD_CONFIG } from "@/lib/config";
 import GrowthChart from "@/components/health/GrowthChart";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export default function Home() {
   const [babies, setBabies] = useState([]);
@@ -92,23 +94,23 @@ export default function Home() {
             )}
 
             {/* 往年今日 */}
-            {memories && memories.length > 0 && (
-              <div className="w-full mb-8">
-                <h2 className="text-2xl font-semibold mb-4 text-left">往年今日</h2>
+            <div className="w-full mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-left">往年今日</h2>
+              {memories && memories.length > 0 ? (
                 <div className="space-y-4">
                   {memories.map((memory) => {
                     const postDate = new Date(memory.create_time);
                     const yearsAgo = !isNaN(postDate.getTime()) ? new Date().getFullYear() - postDate.getFullYear() : 0;
                     return (
-                      <div key={memory.id} className="ant-card ant-card-small border rounded-lg overflow-hidden">
-                        <div className="ant-card-head border-b p-3">
-                          <div className="ant-card-head-wrapper flex justify-between items-center">
-                            <div className="ant-card-extra text-sm text-gray-500 text-left">
-                              {memory.user.familymember}:在 <span>{yearsAgo}年前</span> 添加了一条{memory.babies && memory.babies.length > 0 ? `关于${memory.babies.map(baby => baby.name).join('、')}` : ''} 数据
+                      <div key={memory.id} className=" border rounded-lg overflow-hidden">
+                        <div className=" border-b p-3">
+                          <div className=" flex justify-between items-center">
+                            <div className=" text-sm text-gray-500 text-left">
+                              {memory.user.familymember}:在 <TooltipProvider><Tooltip><TooltipTrigger><span>{yearsAgo}年前</span></TooltipTrigger><TooltipContent>{postDate.getFullYear()}年{String(postDate.getMonth() + 1).padStart(2, '0')}月{String(postDate.getDate()).padStart(2, '0')}日</TooltipContent></Tooltip></TooltipProvider> 添加了一条{memory.babies && memory.babies.length > 0 ? `关于${memory.babies.map(baby => baby.name).join('、')}` : ''} 数据
                             </div>
                           </div>
                         </div>
-                        <div className="ant-card-body p-3">
+                        <div className=" p-3">
                           <div className=" text-left">
                             {memory.blog.replace(/<[^>]*>/g, '')}
                           </div>
@@ -143,8 +145,18 @@ export default function Home() {
                     );
                   })}
                 </div>
-              </div>
-            )}
+              ) : (
+                <div className="text-center py-8 border rounded-lg">
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">往年的今天还没有数据，不如现在添加一条吧！</p>
+                  <Button 
+                    onClick={() => window.location.href = '/blogs/create'}
+                    className="bg-primary hover:bg-primary/90"
+                  >
+                    添加日志
+                  </Button>
+                </div>
+              )}
+            </div>
           </>
         )}
       </div>

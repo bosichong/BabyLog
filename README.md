@@ -23,18 +23,26 @@ BabyLog是用来记录孩子成长过程的日记，那年今天,全文搜索等
 
 ## 界面预览
 
-![预览](./images/b11.png)
+![预览](./imgs/11.jpg)
 
 支持暗黑模式
 
-![预览](./images/b77.png)
+![预览](./imgs/77.jpg)
 
 
-![预览](./images/b22.png)
-![预览](./images/b33.png)
-![预览](./images/b44.png)
-![预览](./images/b55.png)
-![预览](./images/b66.png)
+![预览](./imgs/22.jpg)
+
+
+![预览](./imgs/33.jpg)
+
+
+![预览](./imgs/44.jpg)
+
+
+![预览](./imgs/55.jpg)
+
+
+![预览](./imgs/66.jpg)
 
 
 

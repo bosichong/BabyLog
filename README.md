@@ -58,10 +58,15 @@ BabyLog是用来记录孩子成长过程的日记，那年今天,全文搜索等
     ```bash
     node install.js
     ```
+生产环境启动前必须构建前端：
+
+    ```bash
+    npm run build
+    ```
     
     这个脚本会自动安装根目录、Express后端和Next.js前端的所有依赖。
 
-3. 启动应用：
+1. 启动应用：
 
     生产环境启动：
     ```bash

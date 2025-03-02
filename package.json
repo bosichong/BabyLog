@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "start": "node start-no-pm2.js",
-    "dev": "node start-no-pm2.js --dev",
+    "start": "node start.js",
+    "dev": "node start.js --dev",
     "build": "node build-frontend.js"
   }
 }

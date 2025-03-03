@@ -63,7 +63,7 @@ https://www.bilibili.com/video/BV1kbXfYkEdm
     ```bash
     node install.js
     ```
-生产环境启动前必须构建前端：
+3. 生产环境启动前必须构建前端：
 
     ```bash
     npm run build
@@ -71,7 +71,7 @@ https://www.bilibili.com/video/BV1kbXfYkEdm
     
     这个脚本会自动安装根目录、Express后端和Next.js前端的所有依赖。
 
-1. 启动应用：
+4. 启动应用：
 
     生产环境启动：
     ```bash

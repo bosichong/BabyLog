@@ -1,7 +1,32 @@
 // 系统配置文件
 
+// 自动检测环境并选择合适的API基础URL
+function getApiBaseUrl() {
+  // 在浏览器环境中运行
+  if (typeof window !== 'undefined') {
+    // 获取当前主机名
+    const hostname = window.location.hostname;
+    
+    // 如果是localhost或127.0.0.1，使用localhost
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return 'http://localhost:8888';
+    }
+    
+    // 如果是在局域网中，使用当前主机名
+    if (/^192\.168\./.test(hostname) || /^10\./.test(hostname)) {
+      return `http://${hostname}:8888`;
+    }
+    
+    // 如果是在其他环境（如生产环境），使用当前主机名
+    return `http://${hostname}:8888`;
+  }
+  
+  // 在服务器端渲染环境中，默认使用localhost
+  return 'http://localhost:8888';
+}
+
 // API基础URL配置
-export const API_BASE_URL = 'http://localhost:8888';
+export const API_BASE_URL = getApiBaseUrl();
 
 // API版本前缀
 export const API_VERSION = '/v1';

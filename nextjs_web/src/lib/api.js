@@ -153,3 +153,25 @@ export const healthAPI = {
   updateHealthRecord: (params) => createApiRequest(`/healthies/${params.id}/update`, 'POST')(params),
   deleteHealthRecord: (params) => createApiRequest(`/healthies/${params.id}/delete`, 'POST')()
 };
+
+// Photo API
+export const photoAPI = {
+  uploadPhoto: async (formData) => {
+    const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+    const response = await fetch(`${FULL_API_BASE_URL}/photos/uploadfile`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw error;
+    }
+    return response.json();
+  },
+  deletePhotoByPath: createApiRequest('/photos/delete_img', 'POST'),
+  getAllPhotos: createApiRequest('/photos', 'GET'),
+  deletePhotoById: (params) => createApiRequest(`/photos/${params.id}`, 'POST')()
+};

@@ -104,6 +104,20 @@ export default function CreateBlogPage() {
       console.error("删除图片失败:", err);
     }
   };
+  // 处理确认离开
+  const handleConfirmLeave = async () => {
+    if (photos.length > 0 && !blogCreatedRef.current) {
+      try {
+        await deleteUploadedPhotos(photos);
+        router.push('/blogs');
+      } catch (err) {
+        console.error("离开页面时删除图片失败:", err);
+        setError("离开页面时删除图片失败，请重试");
+      }
+    } else {
+      router.push('/blogs');
+    }
+  };
 
   // 修改页面卸载时的清理逻辑，只在用户离开页面且博客未创建成功时删除图片
   useEffect(() => {
@@ -259,13 +273,23 @@ export default function CreateBlogPage() {
 
           {error && <div className="text-red-500">{error}</div>}
 
-          <Button
-            type="submit"
-            disabled={loading || uploading}
-            className="w-full"
-          >
-            {loading ? "保存中..." : "保存日志"}
-          </Button>
+          <div className="flex justify-between">
+            <Button
+              type="submit"
+              disabled={loading || uploading}
+              className="flex-1 mr-2"
+            >
+              {loading ? "保存中..." : "保存日志"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleConfirmLeave}
+              className="flex-1 ml-2"
+            >
+              取消并离开
+            </Button>
+          </div>
         </form>
       </div>
     </MainLayout>

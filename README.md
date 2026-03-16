@@ -68,7 +68,7 @@ https://www.bilibili.com/video/BV1kbXfYkEdm
     ```bash
     npm run build
     ```
-    
+
     这个脚本会自动安装根目录、Express后端和Next.js前端的所有依赖。
 
 4. 启动应用：
@@ -81,7 +81,7 @@ https://www.bilibili.com/video/BV1kbXfYkEdm
     ```bash
     npm start
     ```
-    
+
     开发环境启动：
     ```bash
     node start.js --dev

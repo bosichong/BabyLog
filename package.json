@@ -3,5 +3,8 @@
     "start": "node start.js",
     "dev": "node start.js --dev",
     "build": "node build-frontend.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.6.2"
   }
 }

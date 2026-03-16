@@ -14,12 +14,11 @@ console.log(`启动模式: ${isDev ? '开发环境' : '生产环境'}`);
 function startBackend() {
   const backendPath = path.join(__dirname, 'express_back');
   const backendScript = isDev ? 'dev' : 'start';
-  
+
   console.log(`启动后端服务 (${backendScript})...`);
   const backend = spawn('npm', ['run', backendScript], {
     cwd: backendPath,
     stdio: 'inherit',
-    shell: true,
     env: {
       ...process.env,
       PORT: 8888
@@ -43,7 +42,6 @@ function startFrontend() {
   const frontend = spawn('npm', ['run', frontendScript], {
     cwd: frontendPath,
     stdio: 'inherit',
-    shell: true,
     env: {
       ...process.env,
       PORT: 3000

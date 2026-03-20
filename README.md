@@ -101,6 +101,70 @@ https://www.bilibili.com/video/BV1kbXfYkEdm
 首次启动程序,会创建管理员账号为：admin,密码为：123456.登录后在导航管理修改密码和个人资料。然后添加宝贝，添加其他家长，就可以开始记录了。
 
 
+## 命令行脚本
+
+项目提供命令行脚本，方便通过终端操作日志数据。
+
+### 添加日志
+
+```bash
+python skills/babylog/scripts/add_blog.py --content "日志内容" --babies "露西" --author "爸爸"
+```
+
+参数：
+- `--content, -c`：日志内容（必填）
+- `--babies, -b`：宝宝名称，多个用逗号分隔（必填）
+- `--author, -a`：添加者，家庭成员称呼，默认"爸爸"
+
+### 搜索日志
+
+```bash
+# 最近10条日志
+python skills/babylog/scripts/search_blog.py
+
+# 最近20条日志
+python skills/babylog/scripts/search_blog.py --limit 20
+
+# 指定宝宝的日志
+python skills/babylog/scripts/search_blog.py --baby "露西"
+
+# 关键字搜索
+python skills/babylog/scripts/search_blog.py --keyword "哭"
+
+# 组合搜索
+python skills/babylog/scripts/search_blog.py --baby "露西" --keyword "测试"
+```
+
+参数：
+- `--limit, -l`：返回数量，默认10条
+- `--baby, -b`：宝宝名称筛选
+- `--keyword, -k`：关键字搜索
+
+### 修改日志
+
+```bash
+# 全量替换
+python skills/babylog/scripts/edit_blog.py --id 123 --replace "全新的内容"
+
+# 部分替换（查找并替换）
+python skills/babylog/scripts/edit_blog.py --id 123 --find "原内容" --replace "新内容"
+
+# 追加内容
+python skills/babylog/scripts/edit_blog.py --id 123 --append "追加的内容"
+
+# 同时更新宝宝关联
+python skills/babylog/scripts/edit_blog.py --id 123 --replace "新内容" --babies "露西,垚垚"
+```
+
+参数：
+- `--id, -i`：日志ID（必填）
+- `--replace, -r`：替换内容（全量替换或部分替换的新内容）
+- `--find, -f`：查找内容（部分替换时使用）
+- `--append, -a`：追加内容
+- `--babies, -b`：新的宝宝关联，多个用逗号分隔（可选）
+
+---
+
 ## 写在最后
 
 这个程序自己真的是使用了好多年，历经几次的重构，从最开始的php原生代码到使用thinkPHP框架，后来有使用Java重构了一次（详见分支master），期间还用Python写了一个终端的录入版，而后使用了flask重构了一下，这次3.0版本使用前后端分离架构，采用Express.js作为后端、Next.js作为前端，使用了现代化的UI组件和响应式设计。这个程序使用也有12年多了，回头看看真是感慨万千，一方面是孩子的记录，一方面是自己学习的渣渣历程。

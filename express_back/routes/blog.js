@@ -28,7 +28,7 @@ router.post('/search', verifyToken, async (req, res) => {
     const blogs = await req.models.Blog.findAll({
       where,
       include: [
-        { model: req.models.User },
+        { model: req.models.User, attributes: { exclude: ['hashed_password'] } },
         { model: req.models.Baby },
         { model: req.models.Photo }
       ],
@@ -60,7 +60,7 @@ router.get('/:id', verifyToken, async (req, res) => {
   try {
     const blog = await req.models.Blog.findByPk(req.params.id, {
       include: [
-        { model: req.models.User },
+        { model: req.models.User, attributes: { exclude: ['hashed_password'] } },
         { model: req.models.Baby },
         { model: req.models.Photo }
       ]
@@ -137,7 +137,7 @@ router.post('/', verifyToken, async (req, res) => {
       // 获取完整的博客信息
       const fullBlog = await req.models.Blog.findByPk(createdBlog.id, {
         include: [
-          { model: req.models.User },
+          { model: req.models.User, attributes: { exclude: ['hashed_password'] } },
           { model: req.models.Baby },
           { model: req.models.Photo }
         ]
@@ -364,7 +364,7 @@ router.get('/memories/today', verifyToken, async (req, res) => {
         ]
       },
       include: [
-        { model: req.models.User },
+        { model: req.models.User, attributes: { exclude: ['hashed_password'] } },
         { model: req.models.Baby },
         { model: req.models.Photo }
       ]

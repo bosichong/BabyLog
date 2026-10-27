@@ -19,16 +19,16 @@ module.exports = (sequelize) => {
       allowNull: false,
       comment: '用户密码'
     },
-    familymember: {
+    family_member: {
       type: DataTypes.STRING(255),
       allowNull: true,
       comment: '家庭成员称呼'
     },
-    sex: {
-      type: DataTypes.STRING(2),
+    gender: {
+      type: DataTypes.STRING(10),
       allowNull: false,
-      defaultValue: '男',
-      comment: '用户性别'
+      defaultValue: 'male',
+      comment: '用户性别：male / female'
     },
     is_active: {
       type: DataTypes.BOOLEAN,
@@ -39,13 +39,13 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING(128),
       comment: '用户头像'
     },
-    create_time: {
+    created_at: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW,
       comment: '创建时间'
     },
-    update_time: {
+    updated_at: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW,
@@ -54,8 +54,8 @@ module.exports = (sequelize) => {
   }, {
     tableName: 'user',
     timestamps: true,
-    createdAt: 'create_time',
-    updatedAt: 'update_time'
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
   });
 
   return User;

@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-  const Healthy = sequelize.define('healthy', {
+  const Healthy = sequelize.define('health_record', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -18,13 +18,13 @@ module.exports = (sequelize) => {
       allowNull: false,
       comment: '体重'
     },
-    create_time: {
+    created_at: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW,
       comment: '创建时间'
     },
-    update_time: {
+    updated_at: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW,
@@ -36,7 +36,7 @@ module.exports = (sequelize) => {
       comment: 'baby'
     }
   }, {
-    tableName: 'healthy',
+    tableName: 'health_record',
     timestamps: false
   });
 

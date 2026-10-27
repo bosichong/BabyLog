@@ -77,8 +77,8 @@ async function createDefaultAdmin(models) {
       await models.User.create({
         username: 'admin',
         hashed_password: hashedPassword,
-        familymember: '管理员',
-        sex: '男',
+        family_member: '管理员',
+        gender: 'male',
         is_active: true // 默认激活状态
       });
       console.log('默认管理员账户创建成功');

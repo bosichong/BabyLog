@@ -35,8 +35,8 @@ describe('Baby API Tests', () => {
         await models.User.create({
             username: 'testuser',
             hashed_password: 'testpassword',
-            familymember: '测试用户',
-            sex: '1',
+            family_member: '测试用户',
+            gender: 'male',
             is_active: true
         });
 

@@ -16,7 +16,7 @@ router.post('/search', verifyToken, async (req, res) => {
 
     // 构建查询条件
     const where = keyword ? {
-      blog: {
+      content: {
         [Op.like]: `%${keyword}%`
       }
     } : {};
@@ -34,7 +34,7 @@ router.post('/search', verifyToken, async (req, res) => {
       ],
       offset: parseInt(offset),
       limit: parseInt(pageSize),
-      order: [['create_time', 'DESC']]
+      order: [['created_at', 'DESC']]
     });
 
     const response = {
@@ -85,7 +85,7 @@ router.get('/:id', verifyToken, async (req, res) => {
 router.post('/', verifyToken, async (req, res) => {
   try {
     console.log('开始创建博客...');
-    const { blog: content, baby_ids, photo_ids } = req.body;
+    const { content, baby_ids, photo_ids } = req.body;
 
     console.log('请求参数:', {
       content: content ? `${content.substring(0, 50)}...` : null,
@@ -99,7 +99,7 @@ router.post('/', verifyToken, async (req, res) => {
       console.log('开始保存博客内容...');
       // 创建博客
       createdBlog = await req.models.Blog.create({
-        blog: content,
+        content,
         user_id: req.user.id
       });
       console.log('博客内容保存成功，ID:', createdBlog.id);
@@ -124,7 +124,7 @@ router.post('/', verifyToken, async (req, res) => {
         const photoRecords = await Promise.all(photo_ids.map(async (photoInfo) => {
           return await req.models.Photo.create({
             file_name: photoInfo.file_name,
-            file_path: photoInfo.file_path,
+            storage_path: photoInfo.storage_path,
             file_url: photoInfo.file_url,
             blog_id: createdBlog.id,
             user_id: req.user.id
@@ -150,7 +150,7 @@ router.post('/', verifyToken, async (req, res) => {
       if (photo_ids && photo_ids.length > 0) {
         console.log('开始清理已上传的图片...');
         for (const photoInfo of photo_ids) {
-          const filePath = path.join(__dirname, '..', 'uploads', photoInfo.file_path);
+          const filePath = path.join(__dirname, '..', 'uploads', photoInfo.storage_path);
           if (fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
           }
@@ -178,7 +178,7 @@ router.post('/', verifyToken, async (req, res) => {
 // 更新博客
 router.post('/:id/update', verifyToken, async (req, res) => {
   // 参数验证
-  const { blog: content, baby_ids, photo_ids = [], removed_photo_ids = [] } = req.body;
+  const { content, baby_ids, photo_ids = [], removed_photo_ids = [] } = req.body;
   if (!content || content.trim().length === 0) {
     return res.status(400).json({
       status: 'error',
@@ -217,17 +217,17 @@ router.post('/:id/update', verifyToken, async (req, res) => {
     }
 
     // 更新博客内容
-    await blog.update({ blog: content }, { transaction });
+    await blog.update({ content }, { transaction });
 
     // 使用Set优化图片去重逻辑
-    const existingPhotoPathSet = new Set(blog.photos.map(photo => photo.file_path));
-    const newPhotoIds = photo_ids.filter(photoInfo => !existingPhotoPathSet.has(photoInfo.file_path));
+    const existingPhotoPathSet = new Set(blog.photos.map(photo => photo.storage_path));
+    const newPhotoIds = photo_ids.filter(photoInfo => !existingPhotoPathSet.has(photoInfo.storage_path));
 
     // 处理要删除的图片，复用已查询的photos数据
     if (removed_photo_ids.length > 0) {
       const photosToRemove = blog.photos.filter(photo => removed_photo_ids.includes(photo.id));
       for (const photo of photosToRemove) {
-        const filePath = path.join(__dirname, '..', 'uploads', photo.file_path);
+        const filePath = path.join(__dirname, '..', 'uploads', photo.storage_path);
         if (fs.existsSync(filePath)) {
           fs.unlinkSync(filePath);
         }
@@ -240,7 +240,7 @@ router.post('/:id/update', verifyToken, async (req, res) => {
       await Promise.all(newPhotoIds.map(async (photoInfo) => {
         return await req.models.Photo.create({
           file_name: photoInfo.file_name,
-          file_path: photoInfo.file_path,
+          storage_path: photoInfo.storage_path,
           file_url: photoInfo.file_url,
           blog_id: blog.id,
           user_id: req.user.id
@@ -264,7 +264,7 @@ router.post('/:id/update', verifyToken, async (req, res) => {
       include: [
         {
           model: req.models.User,
-          attributes: ['id', 'username', 'familymember']
+          attributes: ['id', 'username', 'family_member']
         },
         {
           model: req.models.Baby,
@@ -315,7 +315,7 @@ router.delete('/:id', verifyToken, async (req, res) => {
     // 删除关联的图片记录和文件
     if (blog.photos && blog.photos.length > 0) {
       for (const photo of blog.photos) {
-        const filePath = path.join(__dirname, '..', 'uploads', photo.file_path);
+        const filePath = path.join(__dirname, '..', 'uploads', photo.storage_path);
         if (fs.existsSync(filePath)) {
           fs.unlinkSync(filePath);
         }
@@ -349,15 +349,15 @@ router.get('/memories/today', verifyToken, async (req, res) => {
       where: {
         [Op.and]: [
           sequelize.where(
-            sequelize.fn('strftime', '%m-%d', sequelize.col('blog.create_time')),
+            sequelize.fn('strftime', '%m-%d', sequelize.col('blog.created_at')),
             sequelize.fn('strftime', '%m-%d', sequelize.fn('datetime', 'now'))
           ),
           sequelize.where(
-            sequelize.fn('strftime', '%Y', sequelize.col('blog.create_time')),
+            sequelize.fn('strftime', '%Y', sequelize.col('blog.created_at')),
             { [Op.ne]: sequelize.fn('strftime', '%Y', sequelize.fn('datetime', 'now')) }
           ),
           {
-            'create_time': {
+            'created_at': {
               [Op.lt]: sequelize.fn('datetime', 'now')
             }
           }

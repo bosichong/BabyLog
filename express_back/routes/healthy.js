@@ -23,7 +23,7 @@ router.get('/', verifyToken, async (req, res) => {
         as: 'Baby',
         attributes: ['id', 'name', 'birthday']
       }],
-      order: [['create_time', 'DESC']]
+      order: [['created_at', 'DESC']]
     });
     res.json(healthies);
   } catch (error) {

@@ -39,8 +39,8 @@ describe('Blog API Tests', () => {
         testUser = await models.User.create({
             username: 'testuser',
             hashed_password: 'testpassword',
-            familymember: '测试成员',
-            sex: '1',
+            family_member: '测试成员',
+            gender: 'male',
             is_active: true
         });
 
@@ -61,7 +61,7 @@ describe('Blog API Tests', () => {
     describe('GET /v1/blogs', () => {
         it('should return all blogs', async () => {
             const blog = await models.Blog.create({
-                blog: '测试博客内容',
+                content: '测试博客内容',
                 user_id: testUser.id
             });
             await blog.setBabies([testBaby]);
@@ -73,7 +73,7 @@ describe('Blog API Tests', () => {
             expect(res.status).toBe(200);
             expect(Array.isArray(res.body)).toBeTruthy();
             expect(res.body.length).toBe(1);
-            expect(res.body[0].blog).toBe('测试博客内容');
+            expect(res.body[0].content).toBe('测试博客内容');
             expect(res.body[0].User).toBeDefined();
             expect(res.body[0].babies).toBeDefined();
         });
@@ -87,7 +87,7 @@ describe('Blog API Tests', () => {
     describe('GET /v1/blogs/:id', () => {
         it('should return blog by id', async () => {
             const blog = await models.Blog.create({
-                blog: '测试单个博客',
+                content: '测试单个博客',
                 user_id: testUser.id
             });
             await blog.setBabies([testBaby]);
@@ -97,7 +97,7 @@ describe('Blog API Tests', () => {
                 .set('Authorization', `Bearer ${testToken}`);
 
             expect(res.status).toBe(200);
-            expect(res.body.blog).toBe('测试单个博客');
+            expect(res.body.content).toBe('测试单个博客');
             expect(res.body.User).toBeDefined();
             expect(res.body.babies).toBeDefined();
         });
@@ -114,7 +114,7 @@ describe('Blog API Tests', () => {
     describe('POST /v1/blogs', () => {
         it('should create new blog', async () => {
             const blogData = {
-                blog: '新建博客内容',
+                content: '新建博客内容',
                 user_id: testUser.id,
                 baby_ids: [testBaby.id]
             };
@@ -125,7 +125,7 @@ describe('Blog API Tests', () => {
                 .send(blogData);
 
             expect(res.status).toBe(201);
-            expect(res.body.blog).toBe('新建博客内容');
+            expect(res.body.content).toBe('新建博客内容');
             expect(res.body.User).toBeDefined();
             expect(res.body.babies).toBeDefined();
             expect(res.body.babies.length).toBe(1);
@@ -135,13 +135,13 @@ describe('Blog API Tests', () => {
     describe('PUT /v1/blogs/:id', () => {
         it('should update blog', async () => {
             const blog = await models.Blog.create({
-                blog: '待更新博客',
+                content: '待更新博客',
                 user_id: testUser.id
             });
             await blog.setBabies([testBaby]);
 
             const updateData = {
-                blog: '已更新博客',
+                content: '已更新博客',
                 baby_ids: [testBaby.id]
             };
 
@@ -151,7 +151,7 @@ describe('Blog API Tests', () => {
                 .send(updateData);
 
             expect(res.status).toBe(200);
-            expect(res.body.blog).toBe('已更新博客');
+            expect(res.body.content).toBe('已更新博客');
             expect(res.body.babies).toBeDefined();
             expect(res.body.babies.length).toBe(1);
         });
@@ -160,7 +160,7 @@ describe('Blog API Tests', () => {
             const res = await request(app)
                 .put('/v1/blogs/999')
                 .set('Authorization', `Bearer ${testToken}`)
-                .send({ blog: '测试' });
+                .send({ content: '测试' });
 
             expect(res.status).toBe(404);
         });
@@ -169,7 +169,7 @@ describe('Blog API Tests', () => {
     describe('DELETE /v1/blogs/:id', () => {
         it('should delete blog', async () => {
             const blog = await models.Blog.create({
-                blog: '待删除博客',
+                content: '待删除博客',
                 user_id: testUser.id
             });
 

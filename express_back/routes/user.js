@@ -43,13 +43,13 @@ router.get('/:id', verifyToken, async (req, res) => {
 // 创建用户
 router.post('/', verifyToken, async (req, res) => {
   try {
-    const { username, password, familymember, sex } = req.body;
+    const { username, password, family_member, gender } = req.body;
     const hashedPassword = await hashPassword(password);
     const user = await req.models.User.create({
       username,
       hashed_password: hashedPassword,
-      familymember,
-      sex,
+      family_member,
+      gender,
       is_active: true
     });
     const { hashed_password, ...userWithoutPassword } = user.toJSON();
@@ -66,7 +66,7 @@ router.post('/', verifyToken, async (req, res) => {
 // 更新用户
 router.post('/:id/update', verifyToken, async (req, res) => {
   try {
-    const { familymember, sex, is_active, password } = req.body;
+    const { family_member, gender, is_active, password } = req.body;
     const user = await req.models.User.findByPk(req.params.id);
     if (!user) {
       return res.status(404).json({
@@ -75,8 +75,8 @@ router.post('/:id/update', verifyToken, async (req, res) => {
       });
     }
     const updateData = {};
-    if (familymember !== undefined) updateData.familymember = familymember;
-    if (sex !== undefined && sex !== null) updateData.sex = sex;
+    if (family_member !== undefined) updateData.family_member = family_member;
+    if (gender !== undefined && gender !== null) updateData.gender = gender;
     if (is_active !== undefined) updateData.is_active = is_active;
     if (password) {
       updateData.hashed_password = await hashPassword(password);

@@ -1,0 +1,78 @@
+@import "@heroui/styles";
+
+/* ==========================================================================
+   覆盖 HeroUI 的 dark 变体：去掉「系统深色自动生效」的 fallback。
+   主题完全由 ThemeProvider 通过 .dark 类控制，这样三态切换（浅色/深色/
+   跟随系统）才是准确的 —— 选浅色时即使系统是深色也保持浅色。
+   ========================================================================== */
+@custom-variant dark {
+  &:is(.dark, .dark *) {
+    @slot;
+
+    &::before,
+    &::after {
+      @slot;
+    }
+  }
+}
+
+/* ==========================================================================
+   品牌主色：绿色（沿用旧版 hsl(142.1 76.2% 36.3%)）
+   --accent 是 HeroUI 组件的主色变量
+   ========================================================================== */
+:root,
+.light,
+[data-theme="light"] {
+  --accent: hsl(142.1 76.2% 36.3%);
+  --accent-foreground: hsl(0 0% 100%);
+}
+
+.dark,
+[data-theme="dark"] {
+  --accent: hsl(142 68% 45%);
+  --accent-foreground: hsl(0 0% 10%);
+}
+
+/* 页面底色：避免深色模式下露白，也避免滚动时露出不匹配的颜色 */
+html {
+  background-color: hsl(0 0% 98%);
+  /* 阻止滚动传给上层容器，减少 iOS 橡皮筋露底 */
+  overscroll-behavior-y: contain;
+}
+
+body {
+  background-color: inherit;
+}
+
+html.dark {
+  background-color: #0a0a0a;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+/* 页面宽度：手机/平板铺满，桌面按断点收窄留白，1920 屏幕上内容最大 1440px */
+:root {
+  --app-max-width: 100%;
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --app-max-width: 75rem; /* 1200px */
+  }
+}
+
+@media (min-width: 1536px) {
+  :root {
+    --app-max-width: 90rem; /* 1440px */
+  }
+}
+
+#root {
+  width: 100%;
+  max-width: var(--app-max-width);
+  margin-inline: auto;
+}

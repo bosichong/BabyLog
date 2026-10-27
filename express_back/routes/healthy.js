@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { Op } = require('sequelize');
 const { verifyToken } = require('../middleware/auth');
 
 // 获取所有健康记录
@@ -12,7 +13,7 @@ router.get('/', verifyToken, async (req, res) => {
     if (baby_ids) {
       const babyIdArray = Array.isArray(baby_ids) ? baby_ids : [baby_ids];
       where.baby_id = {
-        [req.models.Healthy.sequelize.Op.in]: babyIdArray
+        [Op.in]: babyIdArray
       };
     }
 

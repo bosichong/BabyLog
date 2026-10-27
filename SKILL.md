@@ -5,7 +5,7 @@
 ## 项目信息
 
 - **项目名称**：宝贝日记 / 宝贝日志
-- **技术栈**：Express.js + Sequelize + SQLite（后端），Next.js + Shadcn UI（前端）
+- **技术栈**：Express.js + Sequelize + SQLite（后端），React + Vite + HeroUI（前端）
 - **数据库**：SQLite，位于 `express_back/babylog_data.db`
 
 ---
@@ -16,6 +16,8 @@
 
 ```
 User ──1:N──> Blog ──1:N──> Photo
+                 │
+                 ├──1:0..1──> Video
                  │
                  │M:N (via blog_baby)
                  ▼
@@ -32,6 +34,7 @@ User ──1:N──> Blog ──1:N──> Photo
 | blog_baby | 关联表 | id, blog_id, baby_id |
 | health_record | 健康数据 | id, height, weight, baby_id, created_at, updated_at |
 | photo | 照片表 | id, file_name, storage_path, file_url, user_id, blog_id |
+| video | 视频表 | id, file_name, storage_path, file_url, duration, size_bytes, created_at, updated_at, user_id, blog_id |
 
 **字段约定**：全库统一 snake_case；时间字段统一 `created_at` / `updated_at`；性别 `gender` 取值固定为 `male` / `female`。
 

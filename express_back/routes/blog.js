@@ -30,7 +30,8 @@ router.post('/search', verifyToken, async (req, res) => {
       include: [
         { model: req.models.User, attributes: { exclude: ['hashed_password'] } },
         { model: req.models.Baby },
-        { model: req.models.Photo }
+        { model: req.models.Photo },
+        { model: req.models.Video, as: 'video' }
       ],
       offset: parseInt(offset),
       limit: parseInt(pageSize),
@@ -62,7 +63,8 @@ router.get('/:id', verifyToken, async (req, res) => {
       include: [
         { model: req.models.User, attributes: { exclude: ['hashed_password'] } },
         { model: req.models.Baby },
-        { model: req.models.Photo }
+        { model: req.models.Photo },
+        { model: req.models.Video, as: 'video' }
       ]
     });
     if (!blog) {
@@ -85,7 +87,7 @@ router.get('/:id', verifyToken, async (req, res) => {
 router.post('/', verifyToken, async (req, res) => {
   try {
     console.log('开始创建博客...');
-    const { content, baby_ids, photo_ids } = req.body;
+    const { content, baby_ids, photo_ids, video } = req.body;
 
     console.log('请求参数:', {
       content: content ? `${content.substring(0, 50)}...` : null,
@@ -133,13 +135,29 @@ router.post('/', verifyToken, async (req, res) => {
         console.log('图片关联完成，创建图片记录数量:', photoRecords.length);
       }
 
+      // 关联视频（一篇日志最多一个）
+      if (video && video.storage_path) {
+        console.log('开始关联视频...');
+        await req.models.Video.create({
+          file_name: video.file_name,
+          storage_path: video.storage_path,
+          file_url: video.file_url,
+          duration: video.duration ?? null,
+          size_bytes: video.size_bytes ?? null,
+          blog_id: createdBlog.id,
+          user_id: req.user.id
+        });
+        console.log('视频关联完成');
+      }
+
       console.log('开始获取完整博客信息...');
       // 获取完整的博客信息
       const fullBlog = await req.models.Blog.findByPk(createdBlog.id, {
         include: [
           { model: req.models.User, attributes: { exclude: ['hashed_password'] } },
           { model: req.models.Baby },
-          { model: req.models.Photo }
+          { model: req.models.Photo },
+          { model: req.models.Video, as: 'video' }
         ]
       });
       console.log('博客创建完成，返回完整数据');
@@ -154,6 +172,15 @@ router.post('/', verifyToken, async (req, res) => {
           if (fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
           }
+        }
+      }
+
+      // 如果博客创建失败，清理已上传的视频
+      if (video && video.storage_path) {
+        console.log('开始清理已上传的视频...');
+        const videoPath = path.join(__dirname, '..', 'uploads', video.storage_path);
+        if (fs.existsSync(videoPath)) {
+          fs.unlinkSync(videoPath);
         }
       }
 
@@ -178,7 +205,7 @@ router.post('/', verifyToken, async (req, res) => {
 // 更新博客
 router.post('/:id/update', verifyToken, async (req, res) => {
   // 参数验证
-  const { content, baby_ids, photo_ids = [], removed_photo_ids = [] } = req.body;
+  const { content, baby_ids, photo_ids = [], removed_photo_ids = [], video, remove_video } = req.body;
   if (!content || content.trim().length === 0) {
     return res.status(400).json({
       status: 'error',
@@ -204,7 +231,10 @@ router.post('/:id/update', verifyToken, async (req, res) => {
   
   try {
     const blog = await req.models.Blog.findByPk(req.params.id, {
-      include: [{ model: req.models.Photo }],
+      include: [
+        { model: req.models.Photo },
+        { model: req.models.Video, as: 'video' }
+      ],
       transaction
     });
 
@@ -248,6 +278,39 @@ router.post('/:id/update', verifyToken, async (req, res) => {
       }));
     }
 
+    // ---------- 处理视频（一篇日志最多一个）----------
+    const existingVideo = blog.video;
+    if (remove_video && existingVideo) {
+      const oldVideoPath = path.join(__dirname, '..', 'uploads', existingVideo.storage_path);
+      if (fs.existsSync(oldVideoPath)) {
+        fs.unlinkSync(oldVideoPath);
+      }
+      await existingVideo.destroy({ transaction });
+      console.log('视频已删除');
+    } else if (video && video.storage_path) {
+      if (existingVideo && existingVideo.storage_path === video.storage_path) {
+        console.log('视频未更换，跳过');
+      } else {
+        if (existingVideo) {
+          const oldVideoPath = path.join(__dirname, '..', 'uploads', existingVideo.storage_path);
+          if (fs.existsSync(oldVideoPath)) {
+            fs.unlinkSync(oldVideoPath);
+          }
+          await existingVideo.destroy({ transaction });
+        }
+        await req.models.Video.create({
+          file_name: video.file_name,
+          storage_path: video.storage_path,
+          file_url: video.file_url,
+          duration: video.duration ?? null,
+          size_bytes: video.size_bytes ?? null,
+          blog_id: blog.id,
+          user_id: req.user.id
+        }, { transaction });
+        console.log('视频已更新');
+      }
+    }
+
     // 更新与婴儿的关联
     if (baby_ids) {
       const babies = await req.models.Baby.findAll({
@@ -270,7 +333,8 @@ router.post('/:id/update', verifyToken, async (req, res) => {
           model: req.models.Baby,
           through: { attributes: [] }
         },
-        { model: req.models.Photo }
+        { model: req.models.Photo },
+        { model: req.models.Video, as: 'video' }
       ],
       transaction
     });
@@ -297,7 +361,10 @@ router.delete('/:id', verifyToken, async (req, res) => {
   
   try {
     const blog = await req.models.Blog.findByPk(req.params.id, {
-      include: [{ model: req.models.Photo }],
+      include: [
+        { model: req.models.Photo },
+        { model: req.models.Video, as: 'video' }
+      ],
       transaction
     });
 
@@ -321,6 +388,15 @@ router.delete('/:id', verifyToken, async (req, res) => {
         }
         await photo.destroy({ transaction });
       }
+    }
+
+    // 删除关联的视频记录和文件
+    if (blog.video) {
+      const videoFilePath = path.join(__dirname, '..', 'uploads', blog.video.storage_path);
+      if (fs.existsSync(videoFilePath)) {
+        fs.unlinkSync(videoFilePath);
+      }
+      await blog.video.destroy({ transaction });
     }
 
     // 最后删除博客记录
@@ -366,7 +442,8 @@ router.get('/memories/today', verifyToken, async (req, res) => {
       include: [
         { model: req.models.User, attributes: { exclude: ['hashed_password'] } },
         { model: req.models.Baby },
-        { model: req.models.Photo }
+        { model: req.models.Photo },
+        { model: req.models.Video, as: 'video' }
       ]
     });
 

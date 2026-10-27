@@ -129,6 +129,7 @@ const babyRouter = require('./routes/baby');
 const blogRouter = require('./routes/blog');
 const photoRouter = require('./routes/photo');
 const healthyRouter = require('./routes/healthy');
+const videoRouter = require('./routes/video');
 
 // 注册路由
 app.use('/v1/auth', authRouter);
@@ -137,6 +138,7 @@ app.use('/v1/babies', babyRouter);
 app.use('/v1/blogs', blogRouter);
 app.use('/v1/photos', photoRouter);
 app.use('/v1/healthies', healthyRouter);
+app.use('/v1/videos', videoRouter);
 
 // 基础路由
 app.get('/', (req, res) => {

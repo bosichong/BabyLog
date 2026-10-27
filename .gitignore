@@ -12,6 +12,7 @@ build/
 *.log
 *.db
 *.db.old-schema.bak
+*.db.bak-*
 
 # pyenv
 .python-version

@@ -19,19 +19,21 @@ User ──1:N──> Blog ──1:N──> Photo
                  │
                  │M:N (via blog_baby)
                  ▼
-               Baby ──1:N──> Healthy
+               Baby ──1:N──> HealthRecord
 ```
 
 ### 表说明
 
 | 表名 | 说明 | 主要字段 |
 |------|------|----------|
-| user | 用户表 | id, username, familymember, sex, is_active |
+| user | 用户表 | id, username, family_member, gender, is_active, created_at, updated_at |
 | baby | 宝宝表 | id, name, birthday |
-| blog | 日志表 | id, blog, user_id, create_time |
+| blog | 日志表 | id, content, user_id, created_at, updated_at |
 | blog_baby | 关联表 | id, blog_id, baby_id |
-| healthy | 健康数据 | id, height, weight, baby_id |
-| photo | 照片表 | id, file_name, file_path, file_url, user_id, blog_id |
+| health_record | 健康数据 | id, height, weight, baby_id, created_at, updated_at |
+| photo | 照片表 | id, file_name, storage_path, file_url, user_id, blog_id |
+
+**字段约定**：全库统一 snake_case；时间字段统一 `created_at` / `updated_at`；性别 `gender` 取值固定为 `male` / `female`。
 
 ---
 
@@ -64,7 +66,7 @@ User ──1:N──> Blog ──1:N──> Photo
 3. **添加者** (`author`)
    - 从"添加者是XXX"提取XXX
    - 可选，默认"爸爸"
-   - 精确匹配 user.familymember 字段
+   - 精确匹配 user.family_member 字段
 
 ### 内容处理规则
 

@@ -29,8 +29,8 @@ export default function RegisterPage() {
       await authAPI.register({
         username: formData.get("username"),
         password: password,
-        familymember: formData.get("familymember") || '默认成员',
-        sex: formData.get("sex") || '男',
+        family_member: formData.get("family_member") || '默认成员',
+        gender: formData.get("gender") || 'male',
         is_active: false
       });
 
@@ -94,25 +94,25 @@ export default function RegisterPage() {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="familymember">家庭成员</Label>
+              <Label htmlFor="family_member">家庭成员</Label>
               <Input
-                id="familymember"
-                name="familymember"
+                id="family_member"
+                name="family_member"
                 placeholder="请输入家庭成员称呼"
                 type="text"
                 disabled={isLoading}
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="sex">性别</Label>
+              <Label htmlFor="gender">性别</Label>
               <select
-                id="sex"
-                name="sex"
+                id="gender"
+                name="gender"
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
                 disabled={isLoading}
               >
-                <option value="男">男</option>
-                <option value="女">女</option>
+                <option value="male">男</option>
+                <option value="female">女</option>
               </select>
             </div>
             {error && (

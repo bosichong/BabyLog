@@ -27,8 +27,8 @@ export default function UsersPage() {
   const [userFormData, setUserFormData] = useState({
     username: "",
     password: "",
-    familymember: "",
-    sex: "1",
+    family_member: "",
+    gender: "male",
     is_active: true
   });
 
@@ -90,8 +90,8 @@ export default function UsersPage() {
     setUserFormData({
       username: user.username || "",
       password: "",
-      familymember: user.familymember || "",
-      sex: user.sex || "1",
+      family_member: user.family_member || "",
+      gender: user.gender || "male",
       is_active: user.is_active !== undefined ? user.is_active : true
     });
     setIsEditUserDialogOpen(true);
@@ -109,8 +109,8 @@ export default function UsersPage() {
       setUserFormData({
         username: "",
         password: "",
-        familymember: "",
-        sex: "1",
+        family_member: "",
+        gender: "male",
         is_active: true
       });
       fetchUsers();
@@ -201,32 +201,32 @@ export default function UsersPage() {
       ),
     },
     {
-      name: "familymember",
+      name: "family_member",
       render: (values) => (
         <div className="grid gap-2">
-          <Label htmlFor="familymember">家庭成员</Label>
+          <Label htmlFor="family_member">家庭成员</Label>
           <Input
-            id="familymember"
-            value={values.familymember}
-            onChange={(e) => setUserFormData({ ...userFormData, familymember: e.target.value })}
+            id="family_member"
+            value={values.family_member}
+            onChange={(e) => setUserFormData({ ...userFormData, family_member: e.target.value })}
             required
           />
         </div>
       ),
     },
     {
-      name: "sex",
+      name: "gender",
       render: (values) => (
         <div className="grid gap-2">
-          <Label htmlFor="sex">性别</Label>
+          <Label htmlFor="gender">性别</Label>
           <select
-            id="sex"
-            value={values.sex}
-            onChange={(e) => setUserFormData({ ...userFormData, sex: e.target.value })}
+            id="gender"
+            value={values.gender}
+            onChange={(e) => setUserFormData({ ...userFormData, gender: e.target.value })}
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <option value="1">男</option>
-            <option value="2">女</option>
+            <option value="male">男</option>
+            <option value="female">女</option>
           </select>
         </div>
       ),
@@ -379,11 +379,11 @@ export default function UsersPage() {
             <DataTable
               columns={[
                 { key: "username", title: "用户名" },
-                { key: "familymember", title: "家庭成员" },
+                { key: "family_member", title: "家庭成员" },
                 { 
-                  key: "sex", 
+                  key: "gender", 
                   title: "性别",
-                  render: (value) => value === "1" ? "男" : "女"
+                  render: (value) => value === "male" ? "男" : "女"
                 },
                 {
                   key: "is_active",

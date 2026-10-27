@@ -45,7 +45,7 @@ export default function HealthPage() {
         const data = await healthAPI.getHealthRecords({ baby_ids: selectedBabies });
         // 按时间倒序排序，并筛选只显示选中宝宝的记录
         const filteredData = data.filter(record => selectedBabies.includes(record.Baby?.id));
-        const sortedData = filteredData.sort((a, b) => new Date(b.create_time) - new Date(a.create_time));
+        const sortedData = filteredData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
         setHealthRecords(sortedData);
       } catch (err) {
         setError("获取健康记录失败");
@@ -61,7 +61,7 @@ export default function HealthPage() {
     try {
       const data = await healthAPI.getHealthRecords({ baby_ids: selectedBabies });
       const filteredData = data.filter(record => selectedBabies.includes(record.Baby?.id));
-      const sortedData = filteredData.sort((a, b) => new Date(b.create_time) - new Date(a.create_time));
+      const sortedData = filteredData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
       setHealthRecords(sortedData);
     } catch (err) {
       setError("获取健康记录失败");

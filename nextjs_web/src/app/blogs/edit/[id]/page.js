@@ -36,7 +36,7 @@ export default function EditBlogPage({ params: paramsPromise }) {
     try {
       const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
       for (const photo of photos) {
-        if (!photo || !photo.file_path) continue;
+        if (!photo || !photo.storage_path) continue;
         
         await fetch(`${FULL_API_BASE_URL}/photos/delete_img`, {
           method: "POST",
@@ -44,7 +44,7 @@ export default function EditBlogPage({ params: paramsPromise }) {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify({ photo_path: photo.file_path }),
+          body: JSON.stringify({ photo_path: photo.storage_path }),
         });
       }
     } catch (err) {
@@ -97,7 +97,7 @@ export default function EditBlogPage({ params: paramsPromise }) {
         }
 
         // 设置表单数据
-        setContent(blog.blog);
+        setContent(blog.content);
         setSelectedBabies(blog.babies.map(baby => baby.id));
         setPhotos(blog.photos || []);
       } catch (err) {
@@ -178,12 +178,12 @@ export default function EditBlogPage({ params: paramsPromise }) {
       // 更新博客
       const blogData = {
         id: parseInt(params.id),
-        blog: content,
+        content,
         baby_ids: selectedBabies,
         photo_ids: photos.filter(photo => !removedPhotoIds.includes(photo.id)).map(photo => ({
           id: photo.id,
           file_name: photo.file_name,
-          file_path: photo.file_path,
+          storage_path: photo.storage_path,
           file_url: photo.file_url
         })),
         removed_photo_ids: removedPhotoIds
@@ -234,7 +234,7 @@ export default function EditBlogPage({ params: paramsPromise }) {
                     <Dialog key={`dialog-${photo.id}`}>
                       <DialogTrigger className="w-full ">
                         <img
-                          src={UPLOAD_CONFIG.getFileUrl(photo.file_path)}
+                          src={UPLOAD_CONFIG.getFileUrl(photo.storage_path)}
                           alt={photo.file_name}
                           className="w-full h-32 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
                         />
@@ -245,7 +245,7 @@ export default function EditBlogPage({ params: paramsPromise }) {
                           查看上传的图片大图，按ESC键关闭预览
                         </DialogDescription>
                         <img
-                          src={UPLOAD_CONFIG.getFileUrl(photo.file_path)}
+                          src={UPLOAD_CONFIG.getFileUrl(photo.storage_path)}
                           alt={photo.file_name}
                           className="w-full h-auto max-h-[90vh] object-contain"
                         />

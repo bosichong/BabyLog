@@ -114,7 +114,7 @@ export default function HealthRecordsTable({ records, onRecordsChange }) {
                   <TableCell>{record.Baby?.name}</TableCell>
                   <TableCell>{record.height}</TableCell>
                   <TableCell>{record.weight}</TableCell>
-                  <TableCell>{formatDate(record.create_time)}</TableCell>
+                  <TableCell>{formatDate(record.created_at)}</TableCell>
                   <TableCell className="text-right">
                     <Button
                       variant="ghost"

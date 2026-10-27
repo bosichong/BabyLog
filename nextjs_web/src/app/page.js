@@ -99,20 +99,20 @@ export default function Home() {
               {memories && memories.length > 0 ? (
                 <div className="space-y-4">
                   {memories.map((memory) => {
-                    const postDate = new Date(memory.create_time);
+                    const postDate = new Date(memory.created_at);
                     const yearsAgo = !isNaN(postDate.getTime()) ? new Date().getFullYear() - postDate.getFullYear() : 0;
                     return (
                       <div key={memory.id} className=" border rounded-lg overflow-hidden">
                         <div className=" border-b p-3">
                           <div className=" flex justify-between items-center">
                             <div className=" text-sm text-gray-500 text-left">
-                              {memory.user.familymember}:在 <TooltipProvider><Tooltip><TooltipTrigger><span>{yearsAgo}年前</span></TooltipTrigger><TooltipContent>{postDate.getFullYear()}年{String(postDate.getMonth() + 1).padStart(2, '0')}月{String(postDate.getDate()).padStart(2, '0')}日</TooltipContent></Tooltip></TooltipProvider> 添加了一条{memory.babies && memory.babies.length > 0 ? `关于${memory.babies.map(baby => baby.name).join('、')}` : ''} 数据
+                              {memory.user.family_member}:在 <TooltipProvider><Tooltip><TooltipTrigger><span>{yearsAgo}年前</span></TooltipTrigger><TooltipContent>{postDate.getFullYear()}年{String(postDate.getMonth() + 1).padStart(2, '0')}月{String(postDate.getDate()).padStart(2, '0')}日</TooltipContent></Tooltip></TooltipProvider> 添加了一条{memory.babies && memory.babies.length > 0 ? `关于${memory.babies.map(baby => baby.name).join('、')}` : ''} 数据
                             </div>
                           </div>
                         </div>
                         <div className=" p-3">
                           <div className=" text-left">
-                            {memory.blog.replace(/<[^>]*>/g, '')}
+                            {memory.content.replace(/<[^>]*>/g, '')}
                           </div>
                           {memory.photos && memory.photos.length > 0 && (
                             <div className="mt-3 grid grid-cols-2 md:grid-cols-3 gap-2">
@@ -120,7 +120,7 @@ export default function Home() {
                                 <Dialog key={photo.id}>
                                   <DialogTrigger>
                                     <img
-                                      src={UPLOAD_CONFIG.getFileUrl(photo.file_path)}
+                                      src={UPLOAD_CONFIG.getFileUrl(photo.storage_path)}
                                       alt={photo.file_name}
                                       className="w-full h-32 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
                                     />
@@ -131,7 +131,7 @@ export default function Home() {
                                       查看上传的图片大图，按ESC键关闭预览
                                     </DialogDescription>
                                     <img
-                                      src={UPLOAD_CONFIG.getFileUrl(photo.file_path)}
+                                      src={UPLOAD_CONFIG.getFileUrl(photo.storage_path)}
                                       alt={photo.file_name}
                                       className="w-full h-auto max-h-[90vh] object-contain"
                                     />

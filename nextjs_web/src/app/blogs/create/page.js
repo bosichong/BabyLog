@@ -89,7 +89,7 @@ export default function CreateBlogPage() {
     try {
       const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
       for (const photo of photos) {
-        if (!photo || !photo.file_path) continue;
+        if (!photo || !photo.storage_path) continue;
         
         await fetch(`${FULL_API_BASE_URL}/photos/delete_img`, {
           method: "POST",
@@ -97,7 +97,7 @@ export default function CreateBlogPage() {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify({ photo_path: photo.file_path }),
+          body: JSON.stringify({ photo_path: photo.storage_path }),
         });
       }
     } catch (err) {
@@ -155,12 +155,12 @@ export default function CreateBlogPage() {
     try {
       // 创建博客，确保photo_ids包含完整的图片信息
       const blogData = {
-        blog: content,
+        content,
         baby_ids: selectedBabies,
         photo_ids: photos.map(photo => ({
           id: photo.id,
           file_name: photo.file_name,
-          file_path: photo.file_path,
+          storage_path: photo.storage_path,
           file_url: photo.file_url
         }))
       };
@@ -215,7 +215,7 @@ export default function CreateBlogPage() {
                   <Dialog key={`dialog-${photo.id || index}`}>
                     <DialogTrigger>
                       <img
-                        src={UPLOAD_CONFIG.getFileUrl(photo.file_path)}
+                        src={UPLOAD_CONFIG.getFileUrl(photo.storage_path)}
                         alt={photo.file_name}
                         className="w-full h-32 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
                       />
@@ -226,7 +226,7 @@ export default function CreateBlogPage() {
                         查看上传的图片大图，按ESC键关闭预览
                       </DialogDescription>
                       <img
-                        src={UPLOAD_CONFIG.getFileUrl(photo.file_path)}
+                        src={UPLOAD_CONFIG.getFileUrl(photo.storage_path)}
                         alt={photo.file_name}
                         className="w-full h-auto max-h-[90vh] object-contain"
                       />

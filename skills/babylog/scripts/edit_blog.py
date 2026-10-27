@@ -58,19 +58,19 @@ def find_baby_by_name(cursor, name):
 def find_user_by_id(cursor, user_id):
     """根据用户ID查找用户"""
     cursor.execute(
-        "SELECT id, username, familymember FROM user WHERE id = ?",
+        "SELECT id, username, family_member FROM user WHERE id = ?",
         (user_id,)
     )
     result = cursor.fetchone()
     if result:
-        return {"id": result[0], "username": result[1], "familymember": result[2]}
+        return {"id": result[0], "username": result[1], "family_member": result[2]}
     return None
 
 
 def get_blog_by_id(cursor, blog_id):
     """根据ID获取日志详情"""
     cursor.execute(
-        "SELECT id, blog, user_id, create_time FROM blog WHERE id = ?",
+        "SELECT id, content, user_id, created_at FROM blog WHERE id = ?",
         (blog_id,)
     )
     result = cursor.fetchone()
@@ -79,7 +79,7 @@ def get_blog_by_id(cursor, blog_id):
             "id": result[0],
             "content": result[1],
             "user_id": result[2],
-            "create_time": result[3]
+            "created_at": result[3]
         }
     return None
 
@@ -212,7 +212,7 @@ def edit_blog(blog_id, replace=None, find=None, append=None, babies=None):
         
         # 更新日志内容
         cursor.execute(
-            "UPDATE blog SET blog = ?, update_time = ? WHERE id = ?",
+            "UPDATE blog SET content = ?, updated_at = ? WHERE id = ?",
             (new_content.strip(), current_time, blog_id)
         )
         
@@ -242,8 +242,8 @@ def edit_blog(blog_id, replace=None, find=None, append=None, babies=None):
             "new_content": new_content.strip(),
             "babies": final_babies,
             "author": author,
-            "create_time": blog["create_time"],
-            "update_time": current_time
+            "created_at": blog["created_at"],
+            "updated_at": current_time
         }
         
         conn.close()

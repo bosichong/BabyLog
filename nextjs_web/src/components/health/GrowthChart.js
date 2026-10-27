@@ -18,7 +18,7 @@ export default function GrowthChart({ babyId, babyName }) {
         const processedData = records
           .filter(record => record.baby_id === babyId)
           .map(record => ({
-            date: new Date(record.create_time).toLocaleDateString('zh-CN', {
+            date: new Date(record.created_at).toLocaleDateString('zh-CN', {
               year: 'numeric',
               month: '2-digit',
               day: '2-digit'

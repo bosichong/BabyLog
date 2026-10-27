@@ -83,7 +83,7 @@ router.post('/', verifyToken, async (req, res) => {
 // 更新婴儿信息
 router.post('/:id/update', verifyToken, async (req, res) => {
   try {
-    const { name, birthday, sex } = req.body;
+    const { name, birthday } = req.body;
     
     // 验证日期格式
     const birthdayDate = new Date(birthday);
@@ -107,8 +107,7 @@ router.post('/:id/update', verifyToken, async (req, res) => {
     
     await baby.update({
       name,
-      birthday: formattedBirthday,
-      sex
+      birthday: formattedBirthday
     });
     res.json(baby);
   } catch (error) {

@@ -33,8 +33,8 @@ describe('User API Tests', () => {
         await models.User.create({
             username: 'testuser',
             hashed_password: 'testpassword',
-            familymember: '测试成员',
-            sex: '男',
+            family_member: '测试成员',
+            gender: 'male',
             is_active: true
         });
 
@@ -88,8 +88,8 @@ describe('User API Tests', () => {
             const userData = {
                 username: 'newuser',
                 password: 'newpassword',
-                familymember: '新成员',
-                sex: '女'
+                family_member: '新成员',
+                gender: 'female'
             };
 
             const res = await request(app)
@@ -98,7 +98,7 @@ describe('User API Tests', () => {
 
             expect(res.status).toBe(201);
             expect(res.body).toHaveProperty('username', 'newuser');
-            expect(res.body).toHaveProperty('familymember', '新成员');
+            expect(res.body).toHaveProperty('family_member', '新成员');
             expect(res.body).not.toHaveProperty('hashed_password');
         });
     });
@@ -106,8 +106,8 @@ describe('User API Tests', () => {
     describe('PUT /users/:id', () => {
         it('should update user', async () => {
             const updateData = {
-                familymember: '更新成员',
-                sex: '女',
+                family_member: '更新成员',
+                gender: 'female',
                 is_active: true
             };
 
@@ -117,8 +117,8 @@ describe('User API Tests', () => {
                 .send(updateData);
 
             expect(res.status).toBe(200);
-            expect(res.body).toHaveProperty('familymember', '更新成员');
-            expect(res.body).toHaveProperty('sex', '女');
+            expect(res.body).toHaveProperty('family_member', '更新成员');
+            expect(res.body).toHaveProperty('gender', 'female');
             expect(res.body).toHaveProperty('is_active', true);
         });
 
@@ -126,7 +126,7 @@ describe('User API Tests', () => {
             const res = await request(app)
                 .put('/users/999')
                 .set('Authorization', `Bearer ${testToken}`)
-                .send({ familymember: '测试' });
+                .send({ family_member: '测试' });
 
             expect(res.status).toBe(404);
         });

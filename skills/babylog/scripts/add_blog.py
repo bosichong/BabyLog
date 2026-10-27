@@ -46,12 +46,12 @@ def find_baby_by_name(cursor, name):
 def find_user_by_family_member(cursor, family_member):
     """根据家庭成员称呼查找用户"""
     cursor.execute(
-        "SELECT id, username, familymember FROM user WHERE familymember = ? AND is_active = 1",
+        "SELECT id, username, family_member FROM user WHERE family_member = ? AND is_active = 1",
         (family_member,)
     )
     result = cursor.fetchone()
     if result:
-        return {"id": result[0], "username": result[1], "familymember": result[2]}
+        return {"id": result[0], "username": result[1], "family_member": result[2]}
     return None
 
 
@@ -124,7 +124,7 @@ def add_blog(content, babies, author="爸爸"):
         
         # 插入日志
         cursor.execute(
-            "INSERT INTO blog (blog, user_id, create_time, update_time) VALUES (?, ?, ?, ?)",
+            "INSERT INTO blog (content, user_id, created_at, updated_at) VALUES (?, ?, ?, ?)",
             (content.strip(), author_info["id"], current_time, current_time)
         )
         blog_id = cursor.lastrowid
@@ -142,13 +142,13 @@ def add_blog(content, babies, author="爸爸"):
         # 构建成功结果
         baby_names = "、".join([b["name"] for b in baby_list])
         result["success"] = True
-        result["message"] = f"✅ 日志添加成功！ID: {blog_id}，关联宝宝: {baby_names}，添加者: {author_info['familymember']}"
+        result["message"] = f"✅ 日志添加成功！ID: {blog_id}，关联宝宝: {baby_names}，添加者: {author_info['family_member']}"
         result["data"] = {
             "blog_id": blog_id,
             "content": content.strip(),
             "babies": baby_list,
             "author": author_info,
-            "create_time": current_time
+            "created_at": current_time
         }
         
         return result

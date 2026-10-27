@@ -26,8 +26,8 @@ describe('Database Models Tests', () => {
     user = await models.User.create({
       username: 'testuser',
       hashed_password: 'testpassword',
-      familymember: '测试成员',
-      sex: '1',
+      family_member: '测试成员',
+      gender: 'male',
       is_active: true
     });
 
@@ -37,7 +37,7 @@ describe('Database Models Tests', () => {
     });
 
     blog = await models.Blog.create({
-      blog: '这是一条测试博客内容',
+      content: '这是一条测试博客内容',
       user_id: user.id
     });
 
@@ -71,7 +71,7 @@ describe('Database Models Tests', () => {
       });
       expect(userWithBlogs.blogs).toBeDefined();
       expect(userWithBlogs.blogs.length).toBeGreaterThan(0);
-      expect(userWithBlogs.blogs[0].blog).toBe('这是一条测试博客内容');
+      expect(userWithBlogs.blogs[0].content).toBe('这是一条测试博客内容');
     });
   });
 

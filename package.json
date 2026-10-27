@@ -1,4 +1,6 @@
 {
+  "name": "babylog",
+  "version": "3.1.0",
   "scripts": {
     "start": "node start.js",
     "dev": "node start.js --dev",

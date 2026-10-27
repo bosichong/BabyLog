@@ -13,10 +13,10 @@ module.exports = (sequelize) => {
       allowNull: false,
       comment: '文件名称'
     },
-    file_path: {
+    storage_path: {
       type: DataTypes.STRING(256),
       allowNull: false,
-      comment: '相片服务器地址'
+      comment: '相片服务器相对路径'
     },
     file_url: {
       type: DataTypes.STRING(256),

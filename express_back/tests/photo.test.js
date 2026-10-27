@@ -26,7 +26,7 @@ describe('Photo API Tests', () => {
                 type: Sequelize.STRING,
                 allowNull: false
             },
-            file_path: {
+            storage_path: {
                 type: Sequelize.STRING,
                 allowNull: false
             },
@@ -55,8 +55,8 @@ describe('Photo API Tests', () => {
         await models.User.create({
             username: 'testuser',
             hashed_password: 'testpassword',
-            familymember: '测试用户',
-            sex: '1',
+            family_member: '测试用户',
+            gender: 'male',
             is_active: true
         });
 
@@ -88,13 +88,13 @@ describe('Photo API Tests', () => {
 
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty('message', 'success');
-            expect(res.body).toHaveProperty('file_path');
+            expect(res.body).toHaveProperty('storage_path');
             expect(res.body).toHaveProperty('file_name');
             expect(res.body).toHaveProperty('file_url');
 
             // 清理上传的文件
-            if (res.body.file_path && fs.existsSync(path.join(PHOTO_PATH, res.body.file_path))) {
-                fs.unlinkSync(path.join(PHOTO_PATH, res.body.file_path));
+            if (res.body.storage_path && fs.existsSync(path.join(PHOTO_PATH, res.body.storage_path))) {
+                fs.unlinkSync(path.join(PHOTO_PATH, res.body.storage_path));
             }
         });
 
@@ -156,7 +156,7 @@ describe('Photo API Tests', () => {
             // 先创建一个测试照片记录
             await models.Photo.create({
                 file_name: 'test.jpg',
-                file_path: 'test/test.jpg',
+                storage_path: 'test/test.jpg',
                 file_url: 'test/test.jpg'
             });
 
@@ -184,7 +184,7 @@ describe('Photo API Tests', () => {
 
             const photo = await models.Photo.create({
                 file_name: testFile,
-                file_path: testFile,
+                storage_path: testFile,
                 file_url: testFile
             });
 

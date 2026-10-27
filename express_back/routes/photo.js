@@ -47,7 +47,7 @@ router.post('/uploadfile', verifyToken, upload.single('file'), async (req, res) 
         // 返回文件信息，但不创建数据库记录
         res.json({
             message: 'success',
-            file_path: f_path,
+            storage_path: f_path,
             file_name: file_name,
             file_url: file_url
         });
@@ -65,7 +65,7 @@ router.post('/delete_img', verifyToken, async (req, res) => {
 
         // 查找并删除数据库记录
         const photo = await req.models.Photo.findOne({
-            where: { file_path: photo_path }
+            where: { storage_path: photo_path }
         });
 
         if (photo) {
@@ -106,7 +106,7 @@ router.post('/:id', verifyToken, async (req, res) => {
             return res.status(404).json({ message: '照片不存在' });
         }
 
-        const file_path = path.join(PHOTO_PATH, photo.file_path);
+        const file_path = path.join(PHOTO_PATH, photo.storage_path);
         if (fs.existsSync(file_path)) {
             fs.unlinkSync(file_path);
         }

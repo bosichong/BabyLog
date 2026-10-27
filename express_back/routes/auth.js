@@ -38,7 +38,7 @@ router.post('/token', async (req, res) => {
 // 注册路由
 router.post('/register', async (req, res) => {
   try {
-    const { username, password, familymember, sex } = req.body;
+    const { username, password, family_member, gender } = req.body;
 
     // 检查用户名是否已存在
     const existingUser = await req.models.User.findOne({ where: { username } });
@@ -56,8 +56,8 @@ router.post('/register', async (req, res) => {
     const user = await req.models.User.create({
       username,
       hashed_password: hashedPassword,
-      familymember,
-      sex,
+      family_member,
+      gender,
       is_active: false // 默认为停用状态，需要管理员激活
     });
 

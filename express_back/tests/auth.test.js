@@ -36,8 +36,8 @@ describe('Authentication Tests', () => {
       normalUser = await models.User.create({
         username: normalUsername,
         hashed_password: hashedPassword,
-        familymember: '测试用户',
-        sex: '男',
+        family_member: '测试用户',
+        gender: 'male',
         is_active: true
       });
     });
@@ -70,8 +70,8 @@ describe('Authentication Tests', () => {
       await models.User.create({
         username: disabledUsername,
         hashed_password: disabledHashedPassword,
-        familymember: '禁用测试用户',
-        sex: '男',
+        family_member: '禁用测试用户',
+        gender: 'male',
         is_active: false
       });
 
@@ -101,8 +101,8 @@ describe('Authentication Tests', () => {
       await models.User.create({
         username: tempUsername1,
         hashed_password: hashedPassword1,
-        familymember: '临时用户1',
-        sex: '男',
+        family_member: '临时用户1',
+        gender: 'male',
         is_active: true
       });
 
@@ -121,8 +121,8 @@ describe('Authentication Tests', () => {
       await models.User.create({
         username: tempUsername2,
         hashed_password: hashedPassword2,
-        familymember: '临时用户2',
-        sex: '男',
+        family_member: '临时用户2',
+        gender: 'male',
         is_active: true
       });
 

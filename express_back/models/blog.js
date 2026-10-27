@@ -8,18 +8,18 @@ module.exports = (sequelize) => {
       autoIncrement: true,
       comment: 'id'
     },
-    blog: {
+    content: {
       type: DataTypes.TEXT,
       allowNull: false,
-      comment: 'blog'
+      comment: '日志正文'
     },
-    create_time: {
+    created_at: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW,
       comment: '创建时间'
     },
-    update_time: {
+    updated_at: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW,

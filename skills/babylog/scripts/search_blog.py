@@ -73,9 +73,9 @@ def search_blogs(limit=10, baby=None, keyword=None):
         sql = """
             SELECT 
                 b.id,
-                b.blog,
-                b.create_time,
-                u.familymember as author,
+                b.content,
+                b.created_at,
+                u.family_member as author,
                 GROUP_CONCAT(ba.name, '、') as babies
             FROM blog b
             LEFT JOIN user u ON b.user_id = u.id
@@ -106,13 +106,13 @@ def search_blogs(limit=10, baby=None, keyword=None):
         
         # 关键字搜索
         if keyword:
-            where_clauses.append("b.blog LIKE ?")
+            where_clauses.append("b.content LIKE ?")
             params.append(f"%{keyword}%")
         
         if where_clauses:
             sql += " WHERE " + " AND ".join(where_clauses)
         
-        sql += " GROUP BY b.id ORDER BY b.create_time DESC LIMIT ?"
+        sql += " GROUP BY b.id ORDER BY b.created_at DESC LIMIT ?"
         params.append(limit)
         
         cursor.execute(sql, params)
@@ -125,7 +125,7 @@ def search_blogs(limit=10, baby=None, keyword=None):
             blogs.append({
                 "id": row[0],
                 "content": row[1],
-                "create_time": row[2],
+                "created_at": row[2],
                 "author": row[3],
                 "babies": row[4] or ""
             })
@@ -183,15 +183,15 @@ def format_table(blogs):
             content = content[:content_width-3] + "..."
         
         # 格式化时间（去掉毫秒和时区）
-        create_time = blog["create_time"]
-        if create_time:
+        created_at = blog["created_at"]
+        if created_at:
             # 取前19个字符：YYYY-MM-DD HH:MM:SS
-            create_time = create_time[:19]
+            created_at = created_at[:19]
         
         author = blog["author"] or "-"
         babies = blog["babies"] or "-"
         
-        line = f"| {str(blog['id']):^{id_width}} | {content:^{content_width}} | {create_time:^{time_width}} | {author:^{author_width}} | {babies:^{babies_width}} |"
+        line = f"| {str(blog['id']):^{id_width}} | {content:^{content_width}} | {created_at:^{time_width}} | {author:^{author_width}} | {babies:^{babies_width}} |"
         lines.append(line)
     
     lines.append(separator)

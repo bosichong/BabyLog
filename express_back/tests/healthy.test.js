@@ -36,8 +36,8 @@ describe('Healthy API Tests', () => {
         await models.User.create({
             username: 'testuser',
             hashed_password: 'testpassword',
-            familymember: '测试成员',
-            sex: '1',
+            family_member: '测试成员',
+            gender: 'male',
             is_active: true
         });
 

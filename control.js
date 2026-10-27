@@ -1,6 +1,6 @@
-const { exec } = require('child_process');
-const { spawn } = require('child_process');
+const { exec, spawn } = require('child_process');
 const path = require('path');
+const { stopAll } = require('./stop');
 
 // 检查服务是否在运行
 function checkServices() {
@@ -12,70 +12,22 @@ function checkServices() {
   });
 }
 
-// 停止服务
-function stopServices() {
-  console.log('正在停止 BabyLog 服务...\n');
-
-  exec('lsof -ti:8888 | xargs kill -9 2>/dev/null', (error) => {
-    if (error) {
-      console.log('后端服务未运行');
-    } else {
-      console.log('✓ 后端服务已停止');
-    }
-
-    exec('lsof -ti:3000 | xargs kill -9 2>/dev/null', (error) => {
-      if (error) {
-        console.log('前端服务未运行');
-      } else {
-        console.log('✓ 前端服务已停止');
-      }
-
-      console.log('\n所有服务已关闭！');
-      process.exit(0);
-    });
-  });
-}
-
-// 启动服务
+// 启动服务（复用 start.js，统一进程管理和 PID 文件）
 function startServices() {
   console.log('启动 BabyLog 服务...\n');
-  const backendPath = path.join(__dirname, 'express_back');
-  const frontendPath = path.join(__dirname, 'nextjs_web');
 
-  const backend = spawn('npm', ['run', 'start'], {
-    cwd: backendPath,
+  const child = spawn(process.execPath, [path.join(__dirname, 'start.js')], {
     stdio: 'inherit',
-    shell: true,
-    env: { ...process.env, PORT: 8888 }
+    env: process.env
   });
 
-  const frontend = spawn('npm', ['run', 'start'], {
-    cwd: frontendPath,
-    stdio: 'inherit',
-    shell: true,
-    env: { ...process.env, PORT: 3000 }
-  });
-
-  backend.on('error', (err) => {
-    console.error('后端服务启动失败:', err);
+  child.on('error', (err) => {
+    console.error('服务启动失败:', err);
     process.exit(1);
   });
 
-  frontend.on('error', (err) => {
-    console.error('前端服务启动失败:', err);
-    process.exit(1);
-  });
-
-  console.log('\n服务启动成功！');
-  console.log('- 后端API服务运行在: http://localhost:8888');
-  console.log('- 前端服务运行在: http://localhost:3000');
-  console.log('\n按 Ctrl+C 停止服务\n');
-
-  process.on('SIGINT', () => {
-    console.log('\n正在关闭服务...');
-    backend.kill();
-    frontend.kill();
-    process.exit(0);
+  child.on('exit', (code) => {
+    process.exit(code ?? 0);
   });
 }
 
@@ -98,12 +50,12 @@ async function main() {
     rl.question('请选择操作 (1/2): ', (answer) => {
       rl.close();
       if (answer === '1') {
-        stopServices();
+        stopAll();
+        process.exit(0);
       } else if (answer === '2') {
         console.log('正在停止现有服务...\n');
-        exec('lsof -ti:8888,3000 | xargs kill -9 2>/dev/null', () => {
-          setTimeout(() => startServices(), 1000);
-        });
+        stopAll();
+        setTimeout(() => startServices(), 1000);
       } else {
         console.log('无效选择，退出');
         process.exit(0);

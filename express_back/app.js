@@ -77,8 +77,8 @@ async function createDefaultAdmin(models) {
       await models.User.create({
         username: 'admin',
         hashed_password: hashedPassword,
-        familymember: '管理员',
-        sex: '男',
+        family_member: '管理员',
+        gender: 'male',
         is_active: true // 默认激活状态
       });
       console.log('默认管理员账户创建成功');
@@ -129,6 +129,7 @@ const babyRouter = require('./routes/baby');
 const blogRouter = require('./routes/blog');
 const photoRouter = require('./routes/photo');
 const healthyRouter = require('./routes/healthy');
+const videoRouter = require('./routes/video');
 
 // 注册路由
 app.use('/v1/auth', authRouter);
@@ -137,6 +138,7 @@ app.use('/v1/babies', babyRouter);
 app.use('/v1/blogs', blogRouter);
 app.use('/v1/photos', photoRouter);
 app.use('/v1/healthies', healthyRouter);
+app.use('/v1/videos', videoRouter);
 
 // 基础路由
 app.get('/', (req, res) => {

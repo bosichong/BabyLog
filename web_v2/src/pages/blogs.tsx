@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router'
-import { Pencil, Plus, Search, Trash2 } from 'lucide-react'
+import { useNavigate } from 'react-router'
+import { Pencil, Search, Trash2 } from 'lucide-react'
 import { blogAPI } from '@/lib/api'
 import { formatFullDate, formatTimeAgo, stripHtml } from '@/lib/utils'
 import MediaGallery from '@/components/media-gallery'
@@ -69,16 +69,7 @@ export default function BlogsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold tracking-tight">日志</h1>
-        <Link
-          to="/blogs/new"
-          className="inline-flex items-center gap-1 rounded-xl bg-green-600 px-3 py-1.5 text-sm font-medium text-white"
-        >
-          <Plus size={15} />
-          添加
-        </Link>
-      </div>
+      <h1 className="text-xl font-bold tracking-tight">日志</h1>
 
       <form onSubmit={search} className="flex gap-2">
         <div className="relative flex-1">
@@ -108,7 +99,7 @@ export default function BlogsPage() {
         <p className="py-12 text-center text-sm text-red-500 dark:text-red-400">{error}</p>
       ) : blogs.length === 0 ? (
         <p className="rounded-2xl bg-white dark:bg-neutral-900 py-12 text-center text-sm text-neutral-500 dark:text-neutral-400 ring-1 ring-neutral-200 dark:ring-neutral-800">
-          {appliedKeyword ? '没有找到匹配的日志' : '还没有日志，点右上角「添加」写一条吧'}
+          {appliedKeyword ? '没有找到匹配的日志' : '还没有日志，点底部「添加」写一条吧'}
         </p>
       ) : (
         <div

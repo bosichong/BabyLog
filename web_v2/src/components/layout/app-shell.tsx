@@ -15,6 +15,13 @@ const TABS = [
 export default function AppShell() {
   const navigate = useNavigate()
   const user = auth.getUser()
+  const familyMember = user?.family_member?.trim()
+  const username = user?.username?.trim()
+  const identity =
+    familyMember && username && familyMember !== username
+      ? `${familyMember}(${username})`
+      : familyMember || username || ''
+  const loginLabel = identity ? `${identity} 欢迎登录系统！` : '未登录'
 
   const logout = () => {
     auth.clear()
@@ -25,8 +32,8 @@ export default function AppShell() {
     <div className="mx-auto min-h-dvh w-full max-w-[var(--app-max-width)] bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100">
       {/* ---------- 顶部栏：当前用户 + 退出登录 ---------- */}
       <header className="sticky top-0 z-30 flex items-center justify-between gap-2 border-b border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-900/95 px-4 py-2 backdrop-blur-md sm:px-6 lg:px-8">
-        <span className="min-w-0 truncate text-sm font-medium">
-          {user?.family_member ?? '未登录'}
+        <span className="min-w-0 text-sm font-medium leading-snug" title={loginLabel}>
+          {loginLabel}
         </span>
         <div className="flex shrink-0 items-center gap-1.5">
           <ThemeToggle />

@@ -19,7 +19,7 @@ export default defineConfig({
       manifest: {
         name: '宝贝日记',
         short_name: '宝贝日记',
-        description: '记录孩子成长的每一天',
+        description: '记录孩子与宠物宝贝的每一天',
         theme_color: '#16a34a',
         background_color: '#ffffff',
         display: 'standalone',

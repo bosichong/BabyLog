@@ -2,11 +2,13 @@ import { useState } from 'react'
 import UsersTab from '@/components/settings/users-tab'
 import BabiesTab from '@/components/settings/babies-tab'
 import HealthTab from '@/components/settings/health-tab'
+import AboutTab from '@/components/settings/about-tab'
 
 const TABS = [
   { key: 'users', label: '用户' },
   { key: 'babies', label: '宝贝' },
   { key: 'health', label: '健康数据' },
+  { key: 'about', label: '关于' },
 ] as const
 
 type TabKey = (typeof TABS)[number]['key']
@@ -19,7 +21,7 @@ export default function SettingsPage() {
       <h1 className="text-xl font-bold tracking-tight">管理</h1>
 
       {/* Tab 切换 */}
-      <div className="grid grid-cols-3 gap-1 rounded-xl bg-neutral-200/60 dark:bg-neutral-800/60 p-1">
+      <div className="grid grid-cols-4 gap-1 rounded-xl bg-neutral-200/60 dark:bg-neutral-800/60 p-1">
         {TABS.map(({ key, label }) => (
           <button
             key={key}
@@ -37,6 +39,7 @@ export default function SettingsPage() {
       {tab === 'users' && <UsersTab />}
       {tab === 'babies' && <BabiesTab />}
       {tab === 'health' && <HealthTab />}
+      {tab === 'about' && <AboutTab />}
     </div>
   )
 }

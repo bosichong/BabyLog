@@ -58,7 +58,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm min-w-0">
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">宝贝日记</h1>
-          <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">记录孩子成长的每一天</p>
+          <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">记录孩子与宠物宝贝的每一天</p>
         </div>
 
         <form onSubmit={submit} className="space-y-4">

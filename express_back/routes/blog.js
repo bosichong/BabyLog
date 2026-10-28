@@ -421,22 +421,27 @@ router.get('/memories/today', verifyToken, async (req, res) => {
     const { Op } = require('sequelize');
     const sequelize = req.models.Blog.sequelize;
 
+    // SQLite 的 datetime('now') 是 UTC 时间。直接用它会按 UTC 日期查找，
+    // 在东八区凌晨会错误地返回昨天的记录，所以这里统一按服务器本地日期计算。
+    const now = new Date();
+    const todayMonthDay = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const currentYear = String(now.getFullYear());
+
+    // 新记录由 Sequelize 写成带 +00:00 的 UTC 时间，旧记录是不带时区的本地时间。
+    // 只对带时区的记录做 localtime 转换，避免旧记录的日期被额外偏移一天。
+    const hasTimezone = "blog.created_at GLOB '*[+-][0-9][0-9]:[0-9][0-9]'";
+    const localMonthDay = sequelize.literal(
+      `CASE WHEN ${hasTimezone} THEN strftime('%m-%d', blog.created_at, 'localtime') ELSE strftime('%m-%d', blog.created_at) END`
+    );
+    const localYear = sequelize.literal(
+      `CASE WHEN ${hasTimezone} THEN strftime('%Y', blog.created_at, 'localtime') ELSE strftime('%Y', blog.created_at) END`
+    );
+
     const blogs = await req.models.Blog.findAll({
       where: {
         [Op.and]: [
-          sequelize.where(
-            sequelize.fn('strftime', '%m-%d', sequelize.col('blog.created_at')),
-            sequelize.fn('strftime', '%m-%d', sequelize.fn('datetime', 'now'))
-          ),
-          sequelize.where(
-            sequelize.fn('strftime', '%Y', sequelize.col('blog.created_at')),
-            { [Op.ne]: sequelize.fn('strftime', '%Y', sequelize.fn('datetime', 'now')) }
-          ),
-          {
-            'created_at': {
-              [Op.lt]: sequelize.fn('datetime', 'now')
-            }
-          }
+          sequelize.where(localMonthDay, todayMonthDay),
+          sequelize.where(localYear, { [Op.lt]: currentYear })
         ]
       },
       include: [
@@ -444,7 +449,8 @@ router.get('/memories/today', verifyToken, async (req, res) => {
         { model: req.models.Baby },
         { model: req.models.Photo },
         { model: req.models.Video, as: 'video' }
-      ]
+      ],
+      order: [['created_at', 'DESC']]
     });
 
     res.json(blogs);

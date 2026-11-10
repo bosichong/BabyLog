@@ -16,7 +16,8 @@ export interface Baby {
 }
 
 export interface Photo {
-  id: number
+  /** 已保存图片的数据库 ID；刚上传但尚未关联日志的图片没有该字段 */
+  id?: number
   file_name: string
   storage_path: string
   file_url: string

@@ -5,6 +5,8 @@ const path = require('path');
 const fs = require('fs');
 const { verifyToken } = require('../middleware/auth');
 const { transcodeToMp4 } = require('../utils/transcode');
+const { sendError } = require('../utils/api-error');
+const { sendSuccess } = require('../utils/api-response');
 
 const UPLOAD_ROOT = path.join(__dirname, '../uploads');
 const VIDEO_ROOT = path.join(UPLOAD_ROOT, 'videos');
@@ -56,11 +58,11 @@ router.post('/uploadfile', verifyToken, function (req, res) {
       const message = err.code === 'LIMIT_FILE_SIZE'
         ? `视频超过 ${MAX_SIZE_MB}MB 上限，未上传，请压缩或裁剪后再试`
         : err.message || '上传失败';
-      return res.status(400).json({ message });
+      return sendError(req, res, 400, message);
     }
 
     if (!req.file) {
-      return res.status(400).json({ message: '没有上传文件' });
+      return sendError(req, res, 400, '没有上传文件');
     }
 
     const tmpPath = req.file.path;
@@ -90,17 +92,19 @@ router.post('/uploadfile', verifyToken, function (req, res) {
         const sizeMB = (size / 1024 / 1024).toFixed(1);
         fs.unlinkSync(outputPath);
         console.log(`转码后超过上限，已删除: ${outName} (${sizeMB}MB)`);
-        return res.status(400).json({
-          message: `转码后视频 ${sizeMB}MB，超过 ${MAX_SIZE_MB}MB 上限，请压缩或裁剪后再试`
-        });
+        return sendError(
+          req,
+          res,
+          400,
+          `转码后视频 ${sizeMB}MB，超过 ${MAX_SIZE_MB}MB 上限，请压缩或裁剪后再试`
+        );
       }
 
       const relPath = path.posix.join('videos', year, outName);
 
       console.log(`转码完成: ${outName} ${(size / 1024 / 1024).toFixed(1)}MB 用时 ${elapsed}s`);
 
-      res.json({
-        message: 'success',
+      return sendSuccess(res, {
         file_name: outName,
         storage_path: relPath,
         file_url: relPath,
@@ -110,12 +114,11 @@ router.post('/uploadfile', verifyToken, function (req, res) {
         height: info.height
       });
     } catch (error) {
-      console.error('视频转码失败:', error.message);
       // 清理可能生成的不完整输出
       if (outputPath && fs.existsSync(outputPath)) {
         try { fs.unlinkSync(outputPath); } catch (_) {}
       }
-      res.status(500).json({ message: '视频转码失败，请确认文件是有效的视频格式' });
+      return sendError(req, res, 500, '视频转码失败，请确认文件是有效的视频格式', error);
     } finally {
       // 无论成败都清理临时文件
       if (fs.existsSync(tmpPath)) {
@@ -132,26 +135,25 @@ router.post('/delete', verifyToken, async function (req, res) {
   try {
     const { video_path } = req.body;
     if (!video_path) {
-      return res.status(400).json({ message: '缺少 video_path' });
+      return sendError(req, res, 400, '缺少 video_path');
     }
 
     const absPath = path.resolve(UPLOAD_ROOT, video_path);
 
     // 防目录穿越：只允许删除 videos 目录内的文件
     if (!absPath.startsWith(VIDEO_ROOT + path.sep)) {
-      return res.status(400).json({ message: '非法路径' });
+      return sendError(req, res, 400, '非法路径');
     }
 
     if (!fs.existsSync(absPath)) {
-      return res.status(404).json({ message: '文件不存在' });
+      return sendError(req, res, 404, '文件不存在');
     }
 
     fs.unlinkSync(absPath);
     console.log('视频文件已删除:', video_path);
-    res.json({ success: true });
+    return sendSuccess(res, { deleted: true });
   } catch (error) {
-    console.error('删除视频失败:', error);
-    res.status(500).json({ message: '删除失败' });
+    return sendError(req, res, 500, '删除视频失败', error);
   }
 });
 

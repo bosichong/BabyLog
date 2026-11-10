@@ -60,8 +60,8 @@ export default function BlogsPage() {
       // 删完当前页最后一条就回退一页
       if (blogs.length === 1 && page > 1) goToPage(page - 1)
       else load()
-    } catch (err) {
-      window.alert(err instanceof Error ? err.message : '删除失败，请稍后重试')
+    } catch {
+      // 失败原因由全局接口错误弹窗统一展示。
     }
   }
 

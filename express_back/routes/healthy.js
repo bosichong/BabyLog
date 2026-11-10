@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const { Op } = require('sequelize');
 const { verifyToken } = require('../middleware/auth');
+const { sendError } = require('../utils/api-error');
+const { sendSuccess } = require('../utils/api-response');
 
 // 获取所有健康记录
 router.get('/', verifyToken, async (req, res) => {
@@ -26,13 +28,9 @@ router.get('/', verifyToken, async (req, res) => {
       }],
       order: [['created_at', 'DESC']]
     });
-    res.json(healthies);
+    return sendSuccess(res, healthies);
   } catch (error) {
-    console.error('获取健康记录列表失败:', error);
-    res.status(500).json({
-      status: 'error',
-      message: '获取健康记录列表失败'
-    });
+    return sendError(req, res, 500, '获取健康记录列表失败', error);
   }
 });
 
@@ -47,18 +45,11 @@ router.get('/:id', verifyToken, async (req, res) => {
       }]
     });
     if (!healthy) {
-      return res.status(404).json({
-        status: 'error',
-        message: '健康记录不存在'
-      });
+      return sendError(req, res, 404, '健康记录不存在');
     }
-    res.json(healthy);
+    return sendSuccess(res, healthy);
   } catch (error) {
-    console.error('获取健康记录失败:', error);
-    res.status(500).json({
-      status: 'error',
-      message: '获取健康记录失败'
-    });
+    return sendError(req, res, 500, '获取健康记录失败', error);
   }
 });
 
@@ -73,13 +64,9 @@ router.get('/babies/:babyId', verifyToken, async (req, res) => {
         attributes: ['id', 'name', 'birthday']
       }]
     });
-    res.json(healthies);
+    return sendSuccess(res, healthies);
   } catch (error) {
-    console.error('获取婴儿健康记录失败:', error);
-    res.status(500).json({
-      status: 'error',
-      message: '获取婴儿健康记录失败'
-    });
+    return sendError(req, res, 500, '获取婴儿健康记录失败', error);
   }
 });
 
@@ -100,13 +87,9 @@ router.post('/', verifyToken, async (req, res) => {
         attributes: ['id', 'name', 'birthday']
       }]
     });
-    res.status(201).json(healthyWithBaby);
+    return sendSuccess(res, healthyWithBaby, { status: 201 });
   } catch (error) {
-    console.error('创建健康记录失败:', error);
-    res.status(500).json({
-      status: 'error',
-      message: '创建健康记录失败'
-    });
+    return sendError(req, res, 500, '创建健康记录失败', error);
   }
 });
 
@@ -116,10 +99,7 @@ router.post('/:id/update', verifyToken, async (req, res) => {
     const { height, weight } = req.body;
     const healthy = await req.models.Healthy.findByPk(req.params.id);
     if (!healthy) {
-      return res.status(404).json({
-        status: 'error',
-        message: '健康记录不存在'
-      });
+      return sendError(req, res, 404, '健康记录不存在');
     }
     await healthy.update({
       height,
@@ -133,13 +113,9 @@ router.post('/:id/update', verifyToken, async (req, res) => {
         attributes: ['id', 'name', 'birthday']
       }]
     });
-    res.json(updatedHealthy);
+    return sendSuccess(res, updatedHealthy);
   } catch (error) {
-    console.error('更新健康记录失败:', error);
-    res.status(500).json({
-      status: 'error',
-      message: '更新健康记录失败'
-    });
+    return sendError(req, res, 500, '更新健康记录失败', error);
   }
 });
 
@@ -148,19 +124,12 @@ router.post('/:id/delete', verifyToken, async (req, res) => {
   try {
     const healthy = await req.models.Healthy.findByPk(req.params.id);
     if (!healthy) {
-      return res.status(404).json({
-        status: 'error',
-        message: '健康记录不存在'
-      });
+      return sendError(req, res, 404, '健康记录不存在');
     }
     await healthy.destroy();
-    res.status(204).send();
+    return res.status(204).send();
   } catch (error) {
-    console.error('删除健康记录失败:', error);
-    res.status(500).json({
-      status: 'error',
-      message: '删除健康记录失败'
-    });
+    return sendError(req, res, 500, '删除健康记录失败', error);
   }
 });
 

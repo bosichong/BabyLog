@@ -1,5 +1,6 @@
 import { API_BASE } from './config'
 import { auth } from './auth'
+import { notifyError } from './error-notification'
 import type {
   Baby,
   Blog,
@@ -12,10 +13,12 @@ import type {
 
 export class ApiError extends Error {
   status: number
-  constructor(message: string, status: number) {
+  reason?: string
+  constructor(message: string, status: number, reason?: string) {
     super(message)
     this.name = 'ApiError'
     this.status = status
+    this.reason = reason
   }
 }
 
@@ -49,21 +52,31 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   if (!formData) headers['Content-Type'] = 'application/json'
   if (token) headers.Authorization = `Bearer ${token}`
 
-  const res = await fetch(url, {
-    method,
-    headers,
-    body: formData ?? (body !== undefined ? JSON.stringify(body) : undefined),
-  })
+  let res: Response
+  try {
+    res = await fetch(url, {
+      method,
+      headers,
+      body: formData ?? (body !== undefined ? JSON.stringify(body) : undefined),
+    })
+  } catch (error) {
+    const networkReason = error instanceof Error ? error.message : '未知网络错误'
+    const message = `网络请求失败，无法连接服务器：${networkReason}`
+    notifyError(message)
+    throw new ApiError(message, 0, networkReason)
+  }
 
   // 登录态失效统一处理。
   // 注意：/auth/ 下的 401 是「用户名或密码错误」，不能当成登录过期，
   // 否则真实原因会被掩盖成误导性的提示。
   if (res.status === 401 && !path.startsWith('/auth/')) {
+    const message = '登录已过期，请重新登录'
     auth.clear()
+    notifyError(message, 401)
     if (!window.location.pathname.startsWith('/login')) {
       window.location.href = '/login'
     }
-    throw new ApiError('登录已过期，请重新登录', 401)
+    throw new ApiError(message, 401)
   }
 
   const text = await res.text()
@@ -77,9 +90,23 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   }
 
   if (!res.ok) {
+    const body = data as { message?: string; reason?: string; error?: string } | null
+    const baseMessage = body?.message || body?.error || `请求失败 (${res.status})`
+    const reason = typeof body?.reason === 'string' ? body.reason.trim() : ''
     const message =
-      (data as { message?: string } | null)?.message || `请求失败 (${res.status})`
-    throw new ApiError(message, res.status)
+      reason && reason !== baseMessage ? `${baseMessage}：${reason}` : baseMessage
+    notifyError(message, res.status)
+    throw new ApiError(message, res.status, reason || undefined)
+  }
+
+  if (
+    data &&
+    typeof data === 'object' &&
+    !Array.isArray(data) &&
+    (data as { status?: string }).status === 'success' &&
+    'data' in data
+  ) {
+    return (data as { data: T }).data
   }
 
   return data as T
@@ -105,7 +132,7 @@ export const authAPI = {
     gender: string
     baby_name?: string
     baby_birthday?: string
-  }) => http.post<{ status: string; message: string; data: User }>('/auth/register', payload),
+  }) => http.post<User>('/auth/register', payload),
 }
 
 export const userAPI = {
@@ -146,7 +173,7 @@ export const blogAPI = {
       video?: unknown
       remove_video?: boolean
     },
-  ) => http.post<{ status: string; data: Blog }>(`/blogs/${id}/update`, payload),
+  ) => http.post<Blog>(`/blogs/${id}/update`, payload),
   remove: (id: number) => http.del<null>(`/blogs/${id}`),
   memoriesToday: () => http.get<Blog[]>('/blogs/memories/today'),
 }

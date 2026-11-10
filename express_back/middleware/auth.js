@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const { sendError } = require('../utils/api-error');
 
 // JWT配置
 const JWT_SECRET = 'ededcbe81f2e015697780d536196c0baa6ea26021ad7070867e40b18a51ff8da';
@@ -47,7 +48,7 @@ const verifyToken = async (req, res, next) => {
     const token = authHeader && authHeader.split(' ')[1];
 
     if (!token) {
-      return res.status(401).json({ message: '未提供认证令牌' });
+      return sendError(req, res, 401, '未提供认证令牌');
     }
 
     const decoded = jwt.verify(token, JWT_SECRET);
@@ -56,17 +57,17 @@ const verifyToken = async (req, res, next) => {
     });
 
     if (!user) {
-      return res.status(401).json({ message: '用户不存在' });
+      return sendError(req, res, 401, '用户不存在');
     }
 
     if (!user.is_active) {
-      return res.status(401).json({ message: '账户已被禁用' });
+      return sendError(req, res, 401, '账户已被禁用');
     }
 
     req.user = user;
     next();
   } catch (error) {
-    return res.status(401).json({ message: '无效的认证令牌' });
+    return sendError(req, res, 401, '认证失败', error);
   }
 };
 

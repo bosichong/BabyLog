@@ -1,158 +1,112 @@
 const request = require('supertest');
-const express = require('express');
-const { Sequelize } = require('sequelize');
-const initModels = require('../models/init-models');
 const userRouter = require('../routes/user');
-const { generateToken } = require('../middleware/auth');
+const { auth, createApiTestContext } = require('./helpers/api-test-context');
 
-describe('User API Tests', () => {
-    let app;
-    let sequelize;
-    let models;
-    let testToken;
+describe('User API', () => {
+  let context;
 
-    beforeAll(async () => {
-        // 设置测试数据库
-        sequelize = new Sequelize('sqlite::memory:', { logging: false });
-        models = initModels(sequelize);
+  beforeAll(async () => {
+    context = await createApiTestContext(userRouter, '/v1/users');
+  });
 
-        // 创建Express应用
-        app = express();
-        app.use(express.json());
+  afterAll(async () => {
+    await context.sequelize.close();
+  });
 
-        // 添加models到请求对象
-        app.use((req, res, next) => {
-            req.models = models;
-            next();
-        });
+  it('lists users without password hashes', async () => {
+    const res = await request(context.app)
+      .get('/v1/users')
+      .set(auth(context.token));
 
-        app.use('/', userRouter);
+    expect(res.status).toBe(200);
+    expect(res.body.status).toBe('success');
+    expect(res.body.data).toHaveLength(1);
+    expect(res.body.data[0].username).toBe(context.user.username);
+    expect(res.body.data[0]).not.toHaveProperty('hashed_password');
+  });
 
-        // 同步数据库并创建测试用户
-        await sequelize.sync({ force: true });
-        await models.User.create({
-            username: 'testuser',
-            hashed_password: 'testpassword',
-            family_member: '测试成员',
-            gender: 'male',
-            is_active: true
-        });
+  it('gets a user by id', async () => {
+    const res = await request(context.app)
+      .get(`/v1/users/${context.user.id}`)
+      .set(auth(context.token));
 
-        // 生成测试用token
-        testToken = generateToken('testuser');
+    expect(res.status).toBe(200);
+    expect(res.body.data.username).toBe(context.user.username);
+    expect(res.body.data).not.toHaveProperty('hashed_password');
+  });
+
+  it('returns 404 for an unknown user', async () => {
+    const res = await request(context.app)
+      .get('/v1/users/999999')
+      .set(auth(context.token));
+
+    expect(res.status).toBe(404);
+    expect(res.body).toMatchObject({
+      status: 'error',
+      message: '用户不存在',
+    });
+  });
+
+  it('creates a user', async () => {
+    const res = await request(context.app)
+      .post('/v1/users')
+      .set(auth(context.token))
+      .send({
+        username: 'createduser',
+        password: 'createdpass',
+        family_member: '新成员',
+        gender: 'female',
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body.data).toMatchObject({
+      username: 'createduser',
+      family_member: '新成员',
+      gender: 'female',
+      is_active: true,
+    });
+    expect(res.body.data).not.toHaveProperty('hashed_password');
+  });
+
+  it('updates a user through the current action endpoint', async () => {
+    const res = await request(context.app)
+      .post(`/v1/users/${context.user.id}/update`)
+      .set(auth(context.token))
+      .send({
+        family_member: '更新成员',
+        gender: 'female',
+        is_active: true,
+      });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data).toMatchObject({
+      family_member: '更新成员',
+      gender: 'female',
+      is_active: true,
+    });
+  });
+
+  it('deletes a user through the current action endpoint', async () => {
+    const user = await context.models.User.create({
+      username: 'deleteuser',
+      hashed_password: context.user.hashed_password,
+      family_member: '待删除成员',
+      gender: 'male',
+      is_active: true,
     });
 
-    afterAll(async () => {
-        await sequelize.close();
-    });
+    const res = await request(context.app)
+      .post(`/v1/users/${user.id}/delete`)
+      .set(auth(context.token));
 
-    describe('GET /users', () => {
-        it('should return all users', async () => {
-            const res = await request(app)
-                .get('/users')
-                .set('Authorization', `Bearer ${testToken}`);
+    expect(res.status).toBe(204);
+    expect(await context.models.User.findByPk(user.id)).toBeNull();
+  });
 
-            expect(res.status).toBe(200);
-            expect(Array.isArray(res.body)).toBeTruthy();
-            expect(res.body.length).toBe(1);
-            expect(res.body[0]).toHaveProperty('username', 'testuser');
-        });
+  it('requires authentication', async () => {
+    const res = await request(context.app).get('/v1/users');
 
-        it('should return 401 without token', async () => {
-            const res = await request(app).get('/users');
-            expect(res.status).toBe(401);
-        });
-    });
-
-    describe('GET /users/:id', () => {
-        it('should return user by id', async () => {
-            const res = await request(app)
-                .get('/users/1')
-                .set('Authorization', `Bearer ${testToken}`);
-
-            expect(res.status).toBe(200);
-            expect(res.body).toHaveProperty('username', 'testuser');
-        });
-
-        it('should return 404 for non-existent user', async () => {
-            const res = await request(app)
-                .get('/users/999')
-                .set('Authorization', `Bearer ${testToken}`);
-
-            expect(res.status).toBe(404);
-        });
-    });
-
-    describe('POST /users', () => {
-        it('should create new user', async () => {
-            const userData = {
-                username: 'newuser',
-                password: 'newpassword',
-                family_member: '新成员',
-                gender: 'female'
-            };
-
-            const res = await request(app)
-                .post('/users')
-                .send(userData);
-
-            expect(res.status).toBe(201);
-            expect(res.body).toHaveProperty('username', 'newuser');
-            expect(res.body).toHaveProperty('family_member', '新成员');
-            expect(res.body).not.toHaveProperty('hashed_password');
-        });
-    });
-
-    describe('PUT /users/:id', () => {
-        it('should update user', async () => {
-            const updateData = {
-                family_member: '更新成员',
-                gender: 'female',
-                is_active: true
-            };
-
-            const res = await request(app)
-                .put('/users/1')
-                .set('Authorization', `Bearer ${testToken}`)
-                .send(updateData);
-
-            expect(res.status).toBe(200);
-            expect(res.body).toHaveProperty('family_member', '更新成员');
-            expect(res.body).toHaveProperty('gender', 'female');
-            expect(res.body).toHaveProperty('is_active', true);
-        });
-
-        it('should return 404 for non-existent user', async () => {
-            const res = await request(app)
-                .put('/users/999')
-                .set('Authorization', `Bearer ${testToken}`)
-                .send({ family_member: '测试' });
-
-            expect(res.status).toBe(404);
-        });
-    });
-
-    describe('DELETE /users/:id', () => {
-        it('should delete user', async () => {
-            const res = await request(app)
-                .delete('/users/1')
-                .set('Authorization', `Bearer ${testToken}`);
-
-            expect(res.status).toBe(204);
-
-            // 验证用户已被删除
-            const checkRes = await request(app)
-                .get('/users/1')
-                .set('Authorization', `Bearer ${testToken}`);
-            expect(checkRes.status).toBe(404);
-        });
-
-        it('should return 404 for non-existent user', async () => {
-            const res = await request(app)
-                .delete('/users/999')
-                .set('Authorization', `Bearer ${testToken}`);
-
-            expect(res.status).toBe(404);
-        });
-    });
+    expect(res.status).toBe(401);
+    expect(res.body.status).toBe('error');
+  });
 });

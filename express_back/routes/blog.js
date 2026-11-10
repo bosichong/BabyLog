@@ -3,6 +3,8 @@ const router = express.Router();
 const { verifyToken } = require('../middleware/auth');
 const path = require('path');
 const fs = require('fs');
+const { sendError } = require('../utils/api-error');
+const { sendSuccess } = require('../utils/api-response');
 
 // 获取所有博客（支持分页和搜索）
 router.post('/search', verifyToken, async (req, res) => {
@@ -46,13 +48,9 @@ router.post('/search', verifyToken, async (req, res) => {
       totalPages: Math.ceil(total / pageSize)
     };
 
-    res.json(response);
+    return sendSuccess(res, response);
   } catch (error) {
-    console.error('获取博客列表失败:', error);
-    res.status(500).json({
-      status: 'error',
-      message: '获取博客列表失败'
-    });
+    return sendError(req, res, 500, '获取博客列表失败', error);
   }
 });
 
@@ -68,18 +66,11 @@ router.get('/:id', verifyToken, async (req, res) => {
       ]
     });
     if (!blog) {
-      return res.status(404).json({
-        status: 'error',
-        message: '博客不存在'
-      });
+      return sendError(req, res, 404, '博客不存在');
     }
-    res.json(blog);
+    return sendSuccess(res, blog);
   } catch (error) {
-    console.error('获取博客失败:', error);
-    res.status(500).json({
-      status: 'error',
-      message: '获取博客失败'
-    });
+    return sendError(req, res, 500, '获取博客失败', error);
   }
 });
 
@@ -88,6 +79,16 @@ router.post('/', verifyToken, async (req, res) => {
   try {
     console.log('开始创建博客...');
     const { content, baby_ids, photo_ids, video } = req.body;
+
+    if (!content || content.trim().length === 0) {
+      return sendError(req, res, 400, '博客内容不能为空');
+    }
+    if (baby_ids && !Array.isArray(baby_ids)) {
+      return sendError(req, res, 400, '婴儿ID列表格式不正确');
+    }
+    if (photo_ids && !Array.isArray(photo_ids)) {
+      return sendError(req, res, 400, '图片ID列表格式不正确');
+    }
 
     console.log('请求参数:', {
       content: content ? `${content.substring(0, 50)}...` : null,
@@ -101,7 +102,7 @@ router.post('/', verifyToken, async (req, res) => {
       console.log('开始保存博客内容...');
       // 创建博客
       createdBlog = await req.models.Blog.create({
-        content,
+        content: content.trim(),
         user_id: req.user.id
       });
       console.log('博客内容保存成功，ID:', createdBlog.id);
@@ -161,7 +162,7 @@ router.post('/', verifyToken, async (req, res) => {
         ]
       });
       console.log('博客创建完成，返回完整数据');
-      res.status(201).json(fullBlog);
+      return sendSuccess(res, fullBlog, { status: 201 });
     } catch (error) {
       console.error('博客创建过程中发生错误:', error);
       // 如果博客创建失败，清理已上传的图片
@@ -194,11 +195,7 @@ router.post('/', verifyToken, async (req, res) => {
       throw error;
     }
   } catch (error) {
-    console.error('创建博客失败:', error);
-    res.status(500).json({
-      status: 'error',
-      message: '创建博客失败，已清理相关数据'
-    });
+    return sendError(req, res, 500, '创建博客失败，已清理相关数据', error);
   }
 });
 
@@ -207,24 +204,15 @@ router.post('/:id/update', verifyToken, async (req, res) => {
   // 参数验证
   const { content, baby_ids, photo_ids = [], removed_photo_ids = [], video, remove_video } = req.body;
   if (!content || content.trim().length === 0) {
-    return res.status(400).json({
-      status: 'error',
-      message: '博客内容不能为空'
-    });
+    return sendError(req, res, 400, '博客内容不能为空');
   }
 
   if (baby_ids && !Array.isArray(baby_ids)) {
-    return res.status(400).json({
-      status: 'error',
-      message: '婴儿ID列表格式不正确'
-    });
+    return sendError(req, res, 400, '婴儿ID列表格式不正确');
   }
 
   if (!Array.isArray(photo_ids) || !Array.isArray(removed_photo_ids)) {
-    return res.status(400).json({
-      status: 'error',
-      message: '图片ID列表格式不正确'
-    });
+    return sendError(req, res, 400, '图片ID列表格式不正确');
   }
 
   const transaction = await req.models.Blog.sequelize.transaction();
@@ -240,10 +228,7 @@ router.post('/:id/update', verifyToken, async (req, res) => {
 
     if (!blog) {
       await transaction.rollback();
-      return res.status(404).json({
-        status: 'error',
-        message: '博客不存在'
-      });
+      return sendError(req, res, 404, '博客不存在');
     }
 
     // 更新博客内容
@@ -340,18 +325,12 @@ router.post('/:id/update', verifyToken, async (req, res) => {
     });
 
     await transaction.commit();
-    res.json({
-      status: 'success',
-      message: '博客更新成功',
-      data: updatedBlog
+    return sendSuccess(res, updatedBlog, {
+      message: '博客更新成功'
     });
   } catch (error) {
     await transaction.rollback();
-    console.error('更新博客失败:', error);
-    res.status(500).json({
-      status: 'error',
-      message: '更新博客失败：' + error.message
-    });
+    return sendError(req, res, 500, '更新博客失败', error);
   }
 });
 
@@ -370,10 +349,7 @@ router.delete('/:id', verifyToken, async (req, res) => {
 
     if (!blog) {
       await transaction.rollback();
-      return res.status(404).json({
-        status: 'error',
-        message: '博客不存在'
-      });
+      return sendError(req, res, 404, '博客不存在');
     }
 
     // 删除博客-婴儿关联记录
@@ -404,14 +380,10 @@ router.delete('/:id', verifyToken, async (req, res) => {
 
     // 所有操作成功，提交事务
     await transaction.commit();
-    res.status(204).send();
+    return res.status(204).send();
   } catch (error) {
-    console.error('删除博客失败:', error);
     await transaction.rollback();
-    res.status(500).json({
-      status: 'error',
-      message: error.message || '删除博客失败'
-    });
+    return sendError(req, res, 500, '删除博客失败', error);
   }
 });
 
@@ -453,13 +425,9 @@ router.get('/memories/today', verifyToken, async (req, res) => {
       order: [['created_at', 'DESC']]
     });
 
-    res.json(blogs);
+    return sendSuccess(res, blogs);
   } catch (error) {
-    console.error('获取往年今天的博客失败:', error);
-    res.status(500).json({
-      status: 'error',
-      message: '获取往年今天的博客失败'
-    });
+    return sendError(req, res, 500, '获取往年今天的博客失败', error);
   }
 });
 

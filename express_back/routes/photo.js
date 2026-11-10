@@ -5,6 +5,8 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { verifyToken } = require('../middleware/auth');
+const { sendError } = require('../utils/api-error');
+const { sendSuccess } = require('../utils/api-response');
 
 // 配置文件上传
 const PHOTO_PATH = path.join(__dirname, '../uploads');
@@ -35,7 +37,7 @@ const upload = multer({ storage: storage });
 router.post('/uploadfile', verifyToken, upload.single('file'), async (req, res) => {
     try {
         if (!req.file) {
-            return res.status(400).json({ message: '没有上传文件' });
+            return sendError(req, res, 400, '没有上传文件');
         }
 
         const today = new Date();
@@ -45,15 +47,13 @@ router.post('/uploadfile', verifyToken, upload.single('file'), async (req, res) 
         const file_url = `${year_str}/${file_name}`;
 
         // 返回文件信息，但不创建数据库记录
-        res.json({
-            message: 'success',
+        return sendSuccess(res, {
             storage_path: f_path,
             file_name: file_name,
             file_url: file_url
         });
     } catch (error) {
-        console.error('上传图片失败:', error);
-        res.status(500).json({ message: error.message });
+        return sendError(req, res, 500, '上传图片失败', error);
     }
 });
 
@@ -76,13 +76,13 @@ router.post('/delete_img', verifyToken, async (req, res) => {
             console.log('文件存在，准备删除...');
             fs.unlinkSync(file_path);
             console.log('文件已成功删除');
-            res.json({ success: true });
+            return sendSuccess(res, { deleted: true });
         } else {
             console.log('文件不存在:', file_path);
-            res.status(404).json({ message: '文件不存在' });
+            return sendError(req, res, 404, '文件不存在');
         }
     } catch (error) {
-        res.status(500).json({ message: '删除失败' });
+        return sendError(req, res, 500, '删除图片失败', error);
     }
 });
 
@@ -90,12 +90,10 @@ router.post('/delete_img', verifyToken, async (req, res) => {
 router.get('/', verifyToken, async (req, res) => {
     try {
         const photos = await req.models.Photo.findAll();
-        res.json(photos);
+        return sendSuccess(res, photos);
     } catch (error) {
-        console.error('通过ID删除图片失败:', error);
-        res.status(500).json({ message: error.message });
+        return sendError(req, res, 500, '获取图片列表失败', error);
     }
-    console.log('图片删除处理完成');
 });
 
 // 根据ID删除照片
@@ -103,7 +101,7 @@ router.post('/:id', verifyToken, async (req, res) => {
     try {
         const photo = await req.models.Photo.findByPk(req.params.id);
         if (!photo) {
-            return res.status(404).json({ message: '照片不存在' });
+            return sendError(req, res, 404, '照片不存在');
         }
 
         const file_path = path.join(PHOTO_PATH, photo.storage_path);
@@ -113,12 +111,10 @@ router.post('/:id', verifyToken, async (req, res) => {
 
         await photo.destroy();
         console.log('数据库记录已删除');
-        res.json({ success: true });
+        return sendSuccess(res, { deleted: true });
     } catch (error) {
-        console.error('通过ID删除图片失败:', error);
-        res.status(500).json({ message: error.message });
+        return sendError(req, res, 500, '通过ID删除图片失败', error);
     }
-    console.log('图片删除处理完成');
 });
 
 module.exports = router;

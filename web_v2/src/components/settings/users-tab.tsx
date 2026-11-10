@@ -104,8 +104,8 @@ export default function UsersTab() {
     try {
       await userAPI.remove(user.id)
       load()
-    } catch (err) {
-      window.alert(err instanceof Error ? err.message : '删除失败')
+    } catch {
+      // 失败原因由全局接口错误弹窗统一展示。
     }
   }
 

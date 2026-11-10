@@ -6,6 +6,7 @@
  */
 const BASE = 'http://localhost:8888/v1';
 const { generateToken } = require('../express_back/middleware/auth');
+const { unwrapResponse } = require('./lib/api-response');
 
 const token = generateToken('hua');   // 用真实用户 hua（is_active=1）
 const H = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
@@ -27,14 +28,14 @@ async function req(path, method = 'GET', body) {
   let data = null;
   const text = await res.text();
   try { data = text ? JSON.parse(text) : null; } catch { data = text; }
-  return { status: res.status, data };
+  return { status: res.status, data: unwrapResponse(data) };
 }
 
 (async () => {
   console.log('===== 1. 用户接口（family_member / gender）=====');
   let r = await req('/users');
   check('GET /users 200', r.status === 200, `status=${r.status}`);
-  const users = Array.isArray(r.data) ? r.data : r.data?.data || [];
+  const users = Array.isArray(r.data) ? r.data : [];
   check('用户数 = 3', users.length === 3, `实际 ${users.length}`);
   if (users.length) {
     const u = users.find(x => x.username === 'hua') || users[0];
@@ -50,7 +51,7 @@ async function req(path, method = 'GET', body) {
 
   console.log('\n===== 2. 宝宝接口 =====');
   r = await req('/babies');
-  const babies = Array.isArray(r.data) ? r.data : r.data?.data || [];
+  const babies = Array.isArray(r.data) ? r.data : [];
   check('GET /babies 200', r.status === 200, `status=${r.status}`);
   check('宝宝数 = 2', babies.length === 2, `实际 ${babies.length}`);
   check('垚垚/露西 都在', babies.map(b => b.name).sort().join(',') === '垚垚,露西');
@@ -88,20 +89,20 @@ async function req(path, method = 'GET', body) {
     photo_ids: [],
   });
   check('POST /blogs 201', r.status === 201, `status=${r.status} ${JSON.stringify(r.data).slice(0, 120)}`);
-  const newId = r.data?.data?.id || r.data?.id;
-  check('返回 content 正确', (r.data?.data?.content || r.data?.content)?.includes('E2E 测试'));
+  const newId = r.data?.id;
+  check('返回 content 正确', r.data?.content?.includes('E2E 测试'));
   console.log(`     新日志 id=${newId}`);
 
   console.log('\n===== 7. 更新日志 =====');
   if (newId) {
     r = await req(`/blogs/${newId}/update`, 'POST', { content: '<p>【E2E 测试】已更新</p>', baby_ids: [babies[0].id] });
     check('POST /blogs/:id/update 200', r.status === 200, `status=${r.status}`);
-    check('内容已更新', (r.data?.data?.content || '').includes('已更新'), JSON.stringify(r.data?.data?.content));
+    check('内容已更新', (r.data?.content || '').includes('已更新'), JSON.stringify(r.data?.content));
   }
 
   console.log('\n===== 8. 健康记录（health_record 表）=====');
   r = await req('/healthies');
-  const hrs = Array.isArray(r.data) ? r.data : r.data?.data || [];
+  const hrs = Array.isArray(r.data) ? r.data : [];
   check('GET /healthies 200', r.status === 200, `status=${r.status}`);
   check('健康记录数 = 48', hrs.length === 48, `实际 ${hrs.length}`);
   if (hrs.length) {
@@ -111,7 +112,7 @@ async function req(path, method = 'GET', body) {
   }
   r = await req('/healthies', 'POST', { height: 130, weight: 28, baby_id: babies[0].id });
   check('POST /healthies 201', r.status === 201, `status=${r.status} ${JSON.stringify(r.data).slice(0, 100)}`);
-  const newHrId = r.data?.id || r.data?.data?.id;
+  const newHrId = r.data?.id;
   if (newHrId) {
     r = await req(`/healthies/${newHrId}/delete`, 'POST');
     check('清理测试健康记录', r.status === 200 || r.status === 204, `status=${r.status}`);
@@ -119,7 +120,7 @@ async function req(path, method = 'GET', body) {
 
   console.log('\n===== 9. 照片（storage_path）=====');
   r = await req('/photos');
-  const photos = Array.isArray(r.data) ? r.data : r.data?.data || [];
+  const photos = Array.isArray(r.data) ? r.data : [];
   check('GET /photos 200', r.status === 200, `status=${r.status}`);
   check('照片数 = 128', photos.length === 128, `实际 ${photos.length}`);
   if (photos.length) {

@@ -127,9 +127,10 @@ export default function BlogEditor({ mode, blogId }: Props) {
 
   const removePhoto = async (photo: Photo) => {
     setPhotos((prev) => prev.filter((p) => p !== photo))
-    if (photo.id) {
+    const photoId = photo.id
+    if (photoId != null) {
       // 已有图片：提交时由后端删除
-      setRemovedPhotoIds((prev) => [...prev, photo.id])
+      setRemovedPhotoIds((prev) => [...prev, photoId])
     } else {
       // 刚上传的：立刻删文件
       photoAPI.removeByPath(photo.storage_path).catch(() => {})
@@ -149,18 +150,16 @@ export default function BlogEditor({ mode, blogId }: Props) {
 
     setVideoUploading(true)
     setVideoError('')
+    const previousVideo = video
     try {
-      // 替换式：先清掉原来的
-      if (video) {
-        if (isNewVideo(video)) {
-          await videoAPI.remove(video.storage_path).catch(() => {})
-        } else {
-          setRemoveVideoFlag(true)
-        }
-      }
       const data = await videoAPI.upload(file)
       setVideo(data)
       setRemoveVideoFlag(false)
+      // 已保存的视频由后端在新视频保存时替换；只清理被替换下来的临时视频，
+      // 并且等新视频上传成功后再删，避免上传失败时丢失原文件。
+      if (previousVideo && isNewVideo(previousVideo)) {
+        await videoAPI.remove(previousVideo.storage_path).catch(() => {})
+      }
     } catch (err) {
       setVideoError(err instanceof Error ? err.message : '视频上传失败')
     } finally {
@@ -227,7 +226,9 @@ export default function BlogEditor({ mode, blogId }: Props) {
         await blogAPI.update(blogId, {
           content,
           baby_ids: selectedBabies,
-          photo_ids: photoPayload.filter((p) => p.id),
+          // 新上传图片此时还没有数据库 ID，需要把完整元数据交给后端创建记录；
+          // 已有图片由后端按 storage_path 去重。
+          photo_ids: photoPayload,
           removed_photo_ids: removedPhotoIds,
           video: videoPayload,
           remove_video: removeVideoFlag || undefined,

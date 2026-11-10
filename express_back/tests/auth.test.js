@@ -1,133 +1,98 @@
-const { authenticateUser, generateToken, hashPassword } = require('../middleware/auth');
-const jwt = require('jsonwebtoken');
-const JWT_SECRET = 'ededcbe81f2e015697780d536196c0baa6ea26021ad7070867e40b18a51ff8da';
-const { Sequelize } = require('sequelize');
-const initModels = require('../models/init-models');
+const request = require('supertest');
+const authRouter = require('../routes/auth');
+const { createApiTestContext } = require('./helpers/api-test-context');
 
-describe('Authentication Tests', () => {
-  let sequelize;
-  let models;
+describe('Auth API', () => {
+  let context;
 
   beforeAll(async () => {
-    sequelize = new Sequelize({
-      dialect: 'sqlite',
-      storage: ':memory:',
-      logging: false
-    });
-    models = initModels(sequelize);
-    await sequelize.authenticate();
-    await sequelize.sync({ force: true });
+    context = await createApiTestContext(authRouter, '/v1/auth');
   });
 
   afterAll(async () => {
-    await sequelize.close();
+    await context.sequelize.close();
   });
 
-  describe('User Authentication', () => {
-    let normalUsername;
-    let normalPassword;
-    let normalUser;
+  it('logs in with valid credentials', async () => {
+    const res = await request(context.app)
+      .post('/v1/auth/token')
+      .send({ username: context.user.username, password: context.password });
 
-    beforeEach(async () => {
-      normalUsername = 'testuser_' + Date.now();
-      normalPassword = 'testpass123';
-      const hashedPassword = await hashPassword(normalPassword);
+    expect(res.status).toBe(200);
+    expect(res.body.status).toBe('success');
+    expect(res.body.data).toMatchObject({ token_type: 'bearer' });
+    expect(res.body.data.access_token).toBeTruthy();
+  });
 
-      normalUser = await models.User.create({
-        username: normalUsername,
-        hashed_password: hashedPassword,
-        family_member: '测试用户',
-        gender: 'male',
-        is_active: true
-      });
-    });
+  it('rejects a wrong password', async () => {
+    const res = await request(context.app)
+      .post('/v1/auth/token')
+      .send({ username: context.user.username, password: 'wrong-password' });
 
-    afterEach(async () => {
-      await models.User.destroy({ where: { username: normalUsername } });
-    });
-
-    it('should authenticate normal user successfully', async () => {
-      const authenticatedUser = await authenticateUser(models, normalUsername, normalPassword);
-      expect(authenticatedUser).toBeTruthy();
-
-      const token = generateToken(normalUsername);
-      expect(token).toBeTruthy();
-
-      const decoded = jwt.verify(token, JWT_SECRET);
-      expect(decoded.sub).toBe(normalUsername);
-    });
-
-    it('should reject login with wrong password', async () => {
-      const authenticatedUser = await authenticateUser(models, normalUsername, 'wrongpass');
-      expect(authenticatedUser).toBeFalsy();
-    });
-
-    it('should reject login for disabled user', async () => {
-      const disabledUsername = 'disabled_user_' + Date.now();
-      const disabledPassword = 'testpass456';
-      const disabledHashedPassword = await hashPassword(disabledPassword);
-
-      await models.User.create({
-        username: disabledUsername,
-        hashed_password: disabledHashedPassword,
-        family_member: '禁用测试用户',
-        gender: 'male',
-        is_active: false
-      });
-
-      const authenticatedUser = await authenticateUser(models, disabledUsername, disabledPassword);
-      expect(authenticatedUser).toBeFalsy();
-
-      await models.User.destroy({ where: { username: disabledUsername } });
+    expect(res.status).toBe(401);
+    expect(res.body).toMatchObject({
+      status: 'error',
+      message: '密码错误',
+      error: 'INVALID_PASSWORD',
     });
   });
 
-  describe('Temporary Users', () => {
-    const tempUsername1 = 'temp_user_1';
-    const tempPassword1 = 'temp123';
-    const tempUsername2 = 'temp_user_2';
-    const tempPassword2 = 'temp456';
-
-    beforeEach(async () => {
-      await models.User.destroy({ where: { username: [tempUsername1, tempUsername2] } });
+  it('rejects a disabled user', async () => {
+    const disabledUser = await context.models.User.create({
+      username: 'disableduser',
+      hashed_password: context.user.hashed_password,
+      family_member: '停用成员',
+      gender: 'female',
+      is_active: false,
     });
 
-    afterEach(async () => {
-      await models.User.destroy({ where: { username: [tempUsername1, tempUsername2] } });
-    });
+    const res = await request(context.app)
+      .post('/v1/auth/token')
+      .send({ username: disabledUser.username, password: context.password });
 
-    it('should authenticate temporary user successfully', async () => {
-      const hashedPassword1 = await hashPassword(tempPassword1);
-      await models.User.create({
-        username: tempUsername1,
-        hashed_password: hashedPassword1,
-        family_member: '临时用户1',
-        gender: 'male',
-        is_active: true
+    expect(res.status).toBe(401);
+    expect(res.body).toMatchObject({
+      status: 'error',
+      message: '账户已被禁用',
+      error: 'ACCOUNT_DISABLED',
+    });
+  });
+
+  it('registers a pending user', async () => {
+    const res = await request(context.app)
+      .post('/v1/auth/register')
+      .send({
+        username: 'newuser',
+        password: 'newpass123',
+        family_member: '新成员',
+        gender: 'female',
       });
 
-      const authenticatedUser = await authenticateUser(models, tempUsername1, tempPassword1);
-      expect(authenticatedUser).toBeTruthy();
-
-      const token = generateToken(tempUsername1);
-      expect(token).toBeTruthy();
-
-      const decoded = jwt.verify(token, JWT_SECRET);
-      expect(decoded.sub).toBe(tempUsername1);
+    expect(res.status).toBe(201);
+    expect(res.body.status).toBe('success');
+    expect(res.body.message).toBe('注册成功，请等待管理员审核激活');
+    expect(res.body.data).toMatchObject({
+      username: 'newuser',
+      family_member: '新成员',
+      is_active: false,
     });
+    expect(res.body.data).not.toHaveProperty('hashed_password');
+  });
 
-    it('should reject login with wrong password for temporary user', async () => {
-      const hashedPassword2 = await hashPassword(tempPassword2);
-      await models.User.create({
-        username: tempUsername2,
-        hashed_password: hashedPassword2,
-        family_member: '临时用户2',
+  it('rejects a duplicate username', async () => {
+    const res = await request(context.app)
+      .post('/v1/auth/register')
+      .send({
+        username: context.user.username,
+        password: 'anotherpass',
+        family_member: '重复成员',
         gender: 'male',
-        is_active: true
       });
 
-      const authenticatedUser = await authenticateUser(models, tempUsername2, 'wrongpass');
-      expect(authenticatedUser).toBeFalsy();
+    expect(res.status).toBe(400);
+    expect(res.body).toEqual({
+      status: 'error',
+      message: '用户名已存在',
     });
   });
 });

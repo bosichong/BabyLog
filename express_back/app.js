@@ -6,8 +6,25 @@ const initModels = require('./models/init-models');
 const fs = require('fs');
 const path = require('path');
 const { hashPassword } = require('./middleware/auth');
+const { sendError } = require('./utils/api-error');
+const { sendSuccess } = require('./utils/api-response');
 
 const app = express();
+
+function redactSensitive(value) {
+  if (Array.isArray(value)) return value.map(redactSensitive);
+  if (!value || typeof value !== 'object') return value;
+
+  return Object.fromEntries(
+    Object.entries(value).map(([key, item]) => {
+      const normalizedKey = key.toLowerCase();
+      const sensitive = normalizedKey.includes('password')
+        || normalizedKey.includes('token')
+        || normalizedKey === 'authorization';
+      return [key, sensitive ? '[已隐藏]' : redactSensitive(item)];
+    }),
+  );
+}
 
 // 中间件配置
 app.use(cors({
@@ -25,7 +42,7 @@ app.use((req, res, next) => {
   const start = Date.now();
   console.log(`\n[${new Date().toISOString()}] ${req.method} ${req.url}`);
   if (Object.keys(req.body).length > 0) {
-    console.log('请求体:', JSON.stringify(req.body, null, 2));
+    console.log('请求体:', JSON.stringify(redactSensitive(req.body), null, 2));
   }
   if (Object.keys(req.query).length > 0) {
     console.log('查询参数:', req.query);
@@ -38,6 +55,29 @@ app.use((req, res, next) => {
     console.log(`处理时间: ${duration}ms\n`);
   });
 
+  next();
+});
+
+// 统一记录写操作的成功结果和所有接口失败原因。
+app.use((req, res, next) => {
+  const originalJson = res.json.bind(res);
+  res.json = function loggedJson(body) {
+    const status = res.statusCode;
+    const requestLabel = `${req.method} ${req.originalUrl || req.url || ''}`;
+
+    if (status >= 400) {
+      const reason = res.locals.errorReason
+        || (body && (body.reason || body.message || body.error))
+        || '未提供失败原因';
+      if (!res.locals.errorLogged) {
+        console.error(`[API][失败] ${requestLabel} | HTTP ${status} | 原因: ${reason}`);
+      }
+    } else if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+      console.log(`[API][成功] ${requestLabel} | HTTP ${status}`);
+    }
+
+    return originalJson(body);
+  };
   next();
 });
 
@@ -142,8 +182,7 @@ app.use('/v1/videos', videoRouter);
 
 // 基础路由
 app.get('/', (req, res) => {
-  res.json({
-    status: 'success',
+  return sendSuccess(res, null, {
     message: 'BabyLog API服务正在运行'
   });
 });
@@ -151,21 +190,14 @@ app.get('/', (req, res) => {
 // 处理404路由
 app.use((req, res, next) => {
   if (!req.route) {
-    return res.status(404).json({
-      status: 'error',
-      message: '请求的API路径不存在'
-    });
+    return sendError(req, res, 404, '请求的API路径不存在');
   }
   next();
 });
 
 // 错误处理中间件
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    status: 'error',
-    message: '服务器内部错误'
-  });
+  return sendError(req, res, 500, '服务器内部错误', err);
 });
 
 // 启动服务器

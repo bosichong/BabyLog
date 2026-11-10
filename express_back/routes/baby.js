@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { verifyToken } = require('../middleware/auth');
+const { sendError } = require('../utils/api-error');
+const { sendSuccess } = require('../utils/api-response');
 
 // 获取所有婴儿信息
 router.get('/', verifyToken, async (req, res) => {
@@ -8,13 +10,9 @@ router.get('/', verifyToken, async (req, res) => {
     const babies = await req.models.Baby.findAll({
       include: [{ model: req.models.Healthy, as: 'healthies' }]
     });
-    res.json(babies);
+    return sendSuccess(res, babies);
   } catch (error) {
-    console.error('获取婴儿列表失败:', error);
-    res.status(500).json({
-      status: 'error',
-      message: '获取婴儿列表失败'
-    });
+    return sendError(req, res, 500, '获取婴儿列表失败', error);
   }
 });
 
@@ -30,13 +28,9 @@ router.get('/:id/blogs/count', verifyToken, async (req, res) => {
         attributes: []
       }]
     });
-    res.json({ count });
+    return sendSuccess(res, { count });
   } catch (error) {
-    console.error('获取博客数量失败:', error);
-    res.status(500).json({
-      status: 'error',
-      message: '获取博客数量失败'
-    });
+    return sendError(req, res, 500, '获取博客数量失败', error);
   }
 });
 
@@ -47,18 +41,11 @@ router.get('/:id', verifyToken, async (req, res) => {
       include: [{ model: req.models.Healthy, as: 'healthies' }]
     });
     if (!baby) {
-      return res.status(404).json({
-        status: 'error',
-        message: '婴儿信息不存在'
-      });
+      return sendError(req, res, 404, '婴儿信息不存在');
     }
-    res.json(baby);
+    return sendSuccess(res, baby);
   } catch (error) {
-    console.error('获取婴儿信息失败:', error);
-    res.status(500).json({
-      status: 'error',
-      message: '获取婴儿信息失败'
-    });
+    return sendError(req, res, 500, '获取婴儿信息失败', error);
   }
 });
 
@@ -70,13 +57,9 @@ router.post('/', verifyToken, async (req, res) => {
       name,
       birthday: new Date(birthday)
     });
-    res.status(201).json(baby);
+    return sendSuccess(res, baby, { status: 201 });
   } catch (error) {
-    console.error('创建婴儿信息失败:', error);
-    res.status(500).json({
-      status: 'error',
-      message: '创建婴儿信息失败'
-    });
+    return sendError(req, res, 500, '创建婴儿信息失败', error);
   }
 });
 
@@ -88,18 +71,12 @@ router.post('/:id/update', verifyToken, async (req, res) => {
     // 验证日期格式
     const birthdayDate = new Date(birthday);
     if (isNaN(birthdayDate.getTime())) {
-      return res.status(400).json({
-        status: 'error',
-        message: '无效的出生日期格式，请使用YYYY-MM-DD格式'
-      });
+      return sendError(req, res, 400, '无效的出生日期格式，请使用YYYY-MM-DD格式');
     }
 
     const baby = await req.models.Baby.findByPk(req.params.id);
     if (!baby) {
-      return res.status(404).json({
-        status: 'error',
-        message: '婴儿信息不存在'
-      });
+      return sendError(req, res, 404, '婴儿信息不存在');
     }
 
     // 格式化日期为ISO字符串的日期部分
@@ -109,13 +86,9 @@ router.post('/:id/update', verifyToken, async (req, res) => {
       name,
       birthday: formattedBirthday
     });
-    res.json(baby);
+    return sendSuccess(res, baby);
   } catch (error) {
-    console.error('更新婴儿信息失败:', error);
-    res.status(500).json({
-      status: 'error',
-      message: '更新婴儿信息失败'
-    });
+    return sendError(req, res, 500, '更新婴儿信息失败', error);
   }
 });
 
@@ -124,19 +97,12 @@ router.post('/:id/delete', verifyToken, async (req, res) => {
   try {
     const baby = await req.models.Baby.findByPk(req.params.id);
     if (!baby) {
-      return res.status(404).json({
-        status: 'error',
-        message: '婴儿信息不存在'
-      });
+      return sendError(req, res, 404, '婴儿信息不存在');
     }
     await baby.destroy();
-    res.status(204).send();
+    return res.status(204).send();
   } catch (error) {
-    console.error('删除婴儿信息失败:', error);
-    res.status(500).json({
-      status: 'error',
-      message: '删除婴儿信息失败'
-    });
+    return sendError(req, res, 500, '删除婴儿信息失败', error);
   }
 });
 

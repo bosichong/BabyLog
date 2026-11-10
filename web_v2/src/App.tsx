@@ -3,6 +3,7 @@ import type { ReactElement } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router'
 import AppShell from '@/components/layout/app-shell'
 import PageLoading from '@/components/page-loading'
+import ErrorDialog from '@/components/error-dialog'
 import { auth } from '@/lib/auth'
 
 // 按路由拆包：首屏只加载当前页，图表等重依赖不进主 chunk
@@ -24,41 +25,44 @@ function RequireAuth({ children }: { children: ReactElement }) {
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route
-          path="/login"
-          element={
-            <Suspense fallback={<PageLoading full />}>
-              <LoginPage />
-            </Suspense>
-          }
-        />
-        <Route
-          path="/register"
-          element={
-            <Suspense fallback={<PageLoading full />}>
-              <RegisterPage />
-            </Suspense>
-          }
-        />
+    <>
+      <ErrorDialog />
+      <BrowserRouter>
+        <Routes>
+          <Route
+            path="/login"
+            element={
+              <Suspense fallback={<PageLoading full />}>
+                <LoginPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <Suspense fallback={<PageLoading full />}>
+                <RegisterPage />
+              </Suspense>
+            }
+          />
 
-        <Route
-          element={
-            <RequireAuth>
-              <AppShell />
-            </RequireAuth>
-          }
-        >
-          <Route index element={<HomePage />} />
-          <Route path="blogs" element={<BlogsPage />} />
-          <Route path="blogs/new" element={<BlogNewPage />} />
-          <Route path="blogs/:id/edit" element={<BlogEditPage />} />
-          <Route path="settings" element={<SettingsPage />} />
-        </Route>
+          <Route
+            element={
+              <RequireAuth>
+                <AppShell />
+              </RequireAuth>
+            }
+          >
+            <Route index element={<HomePage />} />
+            <Route path="blogs" element={<BlogsPage />} />
+            <Route path="blogs/new" element={<BlogNewPage />} />
+            <Route path="blogs/:id/edit" element={<BlogEditPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+          </Route>
 
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </>
   )
 }

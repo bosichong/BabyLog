@@ -5,6 +5,7 @@
  */
 const BASE = 'http://localhost:8888/v1';
 const { generateToken } = require('../express_back/middleware/auth');
+const { unwrapResponse } = require('./lib/api-response');
 const token = generateToken('hua');
 const H = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
 
@@ -25,7 +26,7 @@ async function req(path, method = 'GET', body) {
   const text = await res.text();
   let data = null;
   try { data = text ? JSON.parse(text) : null; } catch { data = text; }
-  return { status: res.status, data };
+  return { status: res.status, data: unwrapResponse(data) };
 }
 
 (async () => {
@@ -40,10 +41,10 @@ async function req(path, method = 'GET', body) {
 
   // 创建路径也要查
   const babies = (await req('/babies')).data;
-  const bid = (Array.isArray(babies) ? babies : babies.data)[0].id;
+  const bid = babies[0].id;
   r = await req('/blogs', 'POST', { content: '<p>泄漏探测</p>', baby_ids: [bid], photo_ids: [] });
   scan('POST /blogs (新建返回)', r.data);
-  const nid = r.data?.data?.id || r.data?.id;
+  const nid = r.data?.id;
   if (nid) {
     r = await req(`/blogs/${nid}/update`, 'POST', { content: '<p>泄漏探测改</p>', baby_ids: [bid] });
     scan('POST /blogs/:id/update', r.data);
@@ -51,8 +52,8 @@ async function req(path, method = 'GET', body) {
   }
 
   console.log('\n===== baby 更新回归（已移除 sex）=====');
-  const origName = (Array.isArray(babies) ? babies : babies.data)[0].name;
-  const origBirthday = (Array.isArray(babies) ? babies : babies.data)[0].birthday;
+  const origName = babies[0].name;
+  const origBirthday = babies[0].birthday;
   r = await req(`/babies/${bid}/update`, 'POST', { name: origName, birthday: origBirthday });
   if (r.status === 200) { pass++; console.log(`  ✅ 更新宝宝成功（传 name/birthday，不传 sex）→ ${origName}`); }
   else { fail++; console.log(`  ❌ 更新宝宝失败 status=${r.status} ${JSON.stringify(r.data).slice(0,120)}`); }

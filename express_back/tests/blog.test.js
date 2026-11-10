@@ -1,197 +1,263 @@
 const request = require('supertest');
-const express = require('express');
-const { Sequelize } = require('sequelize');
-const initModels = require('../models/init-models');
 const blogRouter = require('../routes/blog');
-const { generateToken } = require('../middleware/auth');
+const { auth, createApiTestContext } = require('./helpers/api-test-context');
 
-describe('Blog API Tests', () => {
-    let app;
-    let sequelize;
-    let models;
-    let testToken;
-    let testUser;
-    let testBaby;
+function photoPayload(name) {
+  return {
+    file_name: name,
+    storage_path: `2026/${name}`,
+    file_url: `2026/${name}`,
+  };
+}
 
-    beforeAll(async () => {
-        // 设置测试数据库
-        sequelize = new Sequelize('sqlite::memory:', { logging: false });
-        models = initModels(sequelize);
+function videoPayload(name) {
+  return {
+    file_name: name,
+    storage_path: `videos/2026/${name}`,
+    file_url: `videos/2026/${name}`,
+    duration: 12,
+    size_bytes: 1024,
+  };
+}
 
-        // 创建Express应用
-        app = express();
-        app.use(express.json());
-        app.use(express.urlencoded({ extended: true }));
+describe('Blog API', () => {
+  let context;
 
-        // 添加models到请求对象
-        app.use((req, res, next) => {
-            req.models = models;
-            next();
-        });
+  beforeAll(async () => {
+    context = await createApiTestContext(blogRouter, '/v1/blogs', {
+      createBaby: true,
+    });
+  });
 
-        // 注册路由
-        app.use('/v1', blogRouter);
+  afterAll(async () => {
+    await context.sequelize.close();
+  });
 
-        // 同步数据库
-        await sequelize.sync({ force: true });
+  it('searches blogs with pagination', async () => {
+    const blog = await context.models.Blog.create({
+      content: '搜索关键字日志',
+      user_id: context.user.id,
+    });
+    await blog.setBabies([context.baby]);
 
-        // 创建测试用户
-        testUser = await models.User.create({
-            username: 'testuser',
-            hashed_password: 'testpassword',
-            family_member: '测试成员',
-            gender: 'male',
-            is_active: true
-        });
+    const res = await request(context.app)
+      .post('/v1/blogs/search')
+      .set(auth(context.token))
+      .send({ page: 1, pageSize: 10, keyword: '搜索关键字' });
 
-        // 创建测试婴儿
-        testBaby = await models.Baby.create({
-            name: '测试宝宝',
-            birthday: new Date()
-        });
+    expect(res.status).toBe(200);
+    expect(res.body.data).toMatchObject({
+      total: 1,
+      page: 1,
+      pageSize: 10,
+      totalPages: 1,
+    });
+    expect(res.body.data.items[0].content).toBe('搜索关键字日志');
+  });
 
-        // 生成测试用token
-        testToken = generateToken('testuser');
+  it('gets a blog by id', async () => {
+    const blog = await context.models.Blog.create({
+      content: '详情日志',
+      user_id: context.user.id,
+    });
+    await blog.setBabies([context.baby]);
+
+    const res = await request(context.app)
+      .get(`/v1/blogs/${blog.id}`)
+      .set(auth(context.token));
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.content).toBe('详情日志');
+    expect(res.body.data.babies).toHaveLength(1);
+  });
+
+  it('returns 404 for an unknown blog', async () => {
+    const res = await request(context.app)
+      .get('/v1/blogs/999999')
+      .set(auth(context.token));
+
+    expect(res.status).toBe(404);
+    expect(res.body).toMatchObject({
+      status: 'error',
+      message: '博客不存在',
+    });
+  });
+
+  it('creates a blog with a photo and video', async () => {
+    const res = await request(context.app)
+      .post('/v1/blogs')
+      .set(auth(context.token))
+      .send({
+        content: '新建带媒体日志',
+        baby_ids: [context.baby.id],
+        photo_ids: [photoPayload('create-photo.jpg')],
+        video: videoPayload('create-video.mp4'),
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body.data.content).toBe('新建带媒体日志');
+    expect(res.body.data.babies).toHaveLength(1);
+    expect(res.body.data.photos).toHaveLength(1);
+    expect(res.body.data.video.storage_path).toBe('videos/2026/create-video.mp4');
+  });
+
+  it('adds photos and video while editing', async () => {
+    const blog = await context.models.Blog.create({
+      content: '待补充媒体',
+      user_id: context.user.id,
+    });
+    await blog.setBabies([context.baby]);
+
+    const res = await request(context.app)
+      .post(`/v1/blogs/${blog.id}/update`)
+      .set(auth(context.token))
+      .send({
+        content: '已补充媒体',
+        baby_ids: [context.baby.id],
+        photo_ids: [photoPayload('edit-photo.jpg')],
+        video: videoPayload('edit-video.mp4'),
+      });
+
+    expect(res.status).toBe(200);
+    expect(res.body.status).toBe('success');
+    expect(res.body.data.photos).toHaveLength(1);
+    expect(res.body.data.video.storage_path).toBe('videos/2026/edit-video.mp4');
+
+    const savedPhoto = await context.models.Photo.findOne({
+      where: { storage_path: '2026/edit-photo.jpg' },
+    });
+    expect(savedPhoto.blog_id).toBe(blog.id);
+  });
+
+  it('replaces the existing video while editing', async () => {
+    const blog = await context.models.Blog.create({
+      content: '待替换视频',
+      user_id: context.user.id,
+    });
+    await blog.setBabies([context.baby]);
+    await context.models.Video.create({
+      ...videoPayload('first-video.mp4'),
+      blog_id: blog.id,
+      user_id: context.user.id,
     });
 
-    afterAll(async () => {
-        await sequelize.close();
+    const res = await request(context.app)
+      .post(`/v1/blogs/${blog.id}/update`)
+      .set(auth(context.token))
+      .send({
+        content: '已替换视频',
+        baby_ids: [context.baby.id],
+        photo_ids: [],
+        video: videoPayload('second-video.mp4'),
+      });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.video.storage_path).toBe('videos/2026/second-video.mp4');
+
+    const videos = await context.models.Video.findAll({ where: { blog_id: blog.id } });
+    expect(videos).toHaveLength(1);
+    expect(videos[0].storage_path).toBe('videos/2026/second-video.mp4');
+  });
+
+  it('returns a detailed reason when editing fails', async () => {
+    const blog = await context.models.Blog.create({
+      content: '用于验证失败原因',
+      user_id: context.user.id,
+    });
+    await blog.setBabies([context.baby]);
+
+    const res = await request(context.app)
+      .post(`/v1/blogs/${blog.id}/update`)
+      .set(auth(context.token))
+      .send({
+        content: '测试失败原因',
+        baby_ids: [context.baby.id],
+        photo_ids: [null],
+      });
+
+    expect(res.status).toBe(500);
+    expect(res.body).toMatchObject({
+      status: 'error',
+      message: '更新博客失败',
+    });
+    expect(res.body.reason).toContain('storage_path');
+  });
+
+  it('validates required blog content', async () => {
+    const res = await request(context.app)
+      .post('/v1/blogs')
+      .set(auth(context.token))
+      .send({ content: '', baby_ids: [context.baby.id] });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toMatchObject({
+      status: 'error',
+      message: '博客内容不能为空',
     });
 
-    describe('GET /v1/blogs', () => {
-        it('should return all blogs', async () => {
-            const blog = await models.Blog.create({
-                content: '测试博客内容',
-                user_id: testUser.id
-            });
-            await blog.setBabies([testBaby]);
+    const updateRes = await request(context.app)
+      .post('/v1/blogs/1/update')
+      .set(auth(context.token))
+      .send({ content: '', baby_ids: [context.baby.id] });
 
-            const res = await request(app)
-                .get('/v1/blogs')
-                .set('Authorization', `Bearer ${testToken}`);
+    expect(updateRes.status).toBe(400);
+    expect(updateRes.body).toMatchObject({
+      status: 'error',
+      message: '博客内容不能为空',
+    });
+  });
 
-            expect(res.status).toBe(200);
-            expect(Array.isArray(res.body)).toBeTruthy();
-            expect(res.body.length).toBe(1);
-            expect(res.body[0].content).toBe('测试博客内容');
-            expect(res.body[0].User).toBeDefined();
-            expect(res.body[0].babies).toBeDefined();
-        });
-
-        it('should return 401 without token', async () => {
-            const res = await request(app).get('/v1/blogs');
-            expect(res.status).toBe(401);
-        });
+  it('deletes a blog and its associated media', async () => {
+    const blog = await context.models.Blog.create({
+      content: '待删除带媒体日志',
+      user_id: context.user.id,
+    });
+    await blog.setBabies([context.baby]);
+    const photo = await context.models.Photo.create({
+      ...photoPayload('delete-photo.jpg'),
+      blog_id: blog.id,
+      user_id: context.user.id,
+    });
+    const video = await context.models.Video.create({
+      ...videoPayload('delete-video.mp4'),
+      blog_id: blog.id,
+      user_id: context.user.id,
     });
 
-    describe('GET /v1/blogs/:id', () => {
-        it('should return blog by id', async () => {
-            const blog = await models.Blog.create({
-                content: '测试单个博客',
-                user_id: testUser.id
-            });
-            await blog.setBabies([testBaby]);
+    const res = await request(context.app)
+      .delete(`/v1/blogs/${blog.id}`)
+      .set(auth(context.token));
 
-            const res = await request(app)
-                .get(`/v1/blogs/${blog.id}`)
-                .set('Authorization', `Bearer ${testToken}`);
+    expect(res.status).toBe(204);
+    expect(await context.models.Blog.findByPk(blog.id)).toBeNull();
+    expect(await context.models.Photo.findByPk(photo.id)).toBeNull();
+    expect(await context.models.Video.findByPk(video.id)).toBeNull();
+  });
 
-            expect(res.status).toBe(200);
-            expect(res.body.content).toBe('测试单个博客');
-            expect(res.body.User).toBeDefined();
-            expect(res.body.babies).toBeDefined();
-        });
+  it('returns blogs from the same day in previous years', async () => {
+    const now = new Date();
+    const previousYear = new Date(now);
+    previousYear.setFullYear(now.getFullYear() - 1);
 
-        it('should return 404 for non-existent blog', async () => {
-            const res = await request(app)
-                .get('/v1/blogs/999')
-                .set('Authorization', `Bearer ${testToken}`);
-
-            expect(res.status).toBe(404);
-        });
+    await context.models.Blog.create({
+      content: '往年今天日志',
+      user_id: context.user.id,
+      created_at: previousYear,
+      updated_at: previousYear,
     });
 
-    describe('POST /v1/blogs', () => {
-        it('should create new blog', async () => {
-            const blogData = {
-                content: '新建博客内容',
-                user_id: testUser.id,
-                baby_ids: [testBaby.id]
-            };
+    const res = await request(context.app)
+      .get('/v1/blogs/memories/today')
+      .set(auth(context.token));
 
-            const res = await request(app)
-                .post('/v1/blogs')
-                .set('Authorization', `Bearer ${testToken}`)
-                .send(blogData);
+    expect(res.status).toBe(200);
+    expect(res.body.data.some((item) => item.content === '往年今天日志')).toBe(true);
+  });
 
-            expect(res.status).toBe(201);
-            expect(res.body.content).toBe('新建博客内容');
-            expect(res.body.User).toBeDefined();
-            expect(res.body.babies).toBeDefined();
-            expect(res.body.babies.length).toBe(1);
-        });
-    });
+  it('requires authentication', async () => {
+    const res = await request(context.app).post('/v1/blogs/search').send({});
 
-    describe('PUT /v1/blogs/:id', () => {
-        it('should update blog', async () => {
-            const blog = await models.Blog.create({
-                content: '待更新博客',
-                user_id: testUser.id
-            });
-            await blog.setBabies([testBaby]);
-
-            const updateData = {
-                content: '已更新博客',
-                baby_ids: [testBaby.id]
-            };
-
-            const res = await request(app)
-                .put(`/v1/blogs/${blog.id}`)
-                .set('Authorization', `Bearer ${testToken}`)
-                .send(updateData);
-
-            expect(res.status).toBe(200);
-            expect(res.body.content).toBe('已更新博客');
-            expect(res.body.babies).toBeDefined();
-            expect(res.body.babies.length).toBe(1);
-        });
-
-        it('should return 404 for non-existent blog', async () => {
-            const res = await request(app)
-                .put('/v1/blogs/999')
-                .set('Authorization', `Bearer ${testToken}`)
-                .send({ content: '测试' });
-
-            expect(res.status).toBe(404);
-        });
-    });
-
-    describe('DELETE /v1/blogs/:id', () => {
-        it('should delete blog', async () => {
-            const blog = await models.Blog.create({
-                content: '待删除博客',
-                user_id: testUser.id
-            });
-
-            const res = await request(app)
-                .delete(`/v1/blogs/${blog.id}`)
-                .set('Authorization', `Bearer ${testToken}`);
-
-            expect(res.status).toBe(204);
-
-            // 验证博客已被删除
-            const checkRes = await request(app)
-                .get(`/v1/blogs/${blog.id}`)
-                .set('Authorization', `Bearer ${testToken}`);
-            expect(checkRes.status).toBe(404);
-        });
-
-        it('should return 404 for non-existent blog', async () => {
-            const res = await request(app)
-                .delete('/v1/blogs/999')
-                .set('Authorization', `Bearer ${testToken}`);
-
-            expect(res.status).toBe(404);
-        });
-    });
+    expect(res.status).toBe(401);
+    expect(res.body.status).toBe('error');
+  });
 });

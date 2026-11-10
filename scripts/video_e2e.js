@@ -8,6 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 const { generateToken } = require('../express_back/middleware/auth');
+const { unwrapResponse } = require('./lib/api-response');
 
 const BASE = 'http://localhost:8888/v1';
 const UPLOAD_DIR = path.join(__dirname, '../express_back/uploads');
@@ -31,7 +32,7 @@ async function api(pathname, method = 'GET', body) {
   const text = await res.text();
   let data = null;
   try { data = text ? JSON.parse(text) : null; } catch { data = text; }
-  return { status: res.status, data };
+  return { status: res.status, data: unwrapResponse(data) };
 }
 
 async function uploadVideo(filePath, mime) {
@@ -41,7 +42,7 @@ async function uploadVideo(filePath, mime) {
   const text = await res.text();
   let data = null;
   try { data = JSON.parse(text); } catch { data = text; }
-  return { status: res.status, data };
+  return { status: res.status, data: unwrapResponse(data) };
 }
 
 function probe(file) {
@@ -92,7 +93,7 @@ function probe(file) {
              duration: v1.duration, size_bytes: v1.size_bytes },
   });
   check('创建日志 201', r.status === 201, `status=${r.status}`);
-  const blogId = r.data?.id || r.data?.data?.id;
+  const blogId = r.data?.id;
   if (blogId) blogIds.push(blogId);
   check('返回带 video 对象', !!r.data?.video, JSON.stringify(r.data?.video || null).slice(0, 100));
   check('video 关联到该日志', r.data?.video?.blog_id === blogId, `video.blog_id=${r.data?.video?.blog_id} blog=${blogId}`);
@@ -119,7 +120,7 @@ function probe(file) {
              duration: v2.duration, size_bytes: v2.size_bytes },
   });
   check('更新日志 200', r.status === 200, `status=${r.status} ${JSON.stringify(r.data).slice(0, 120)}`);
-  check('video 已换成新的', r.data?.data?.video?.storage_path === v2.storage_path, r.data?.data?.video?.storage_path);
+  check('video 已换成新的', r.data?.video?.storage_path === v2.storage_path, r.data?.video?.storage_path);
   check('旧视频文件已删除', !fs.existsSync(abs1), abs1);
   check('新视频文件存在', fs.existsSync(abs2), abs2);
 
@@ -136,7 +137,7 @@ function probe(file) {
     baby_ids: [1], photo_ids: [], remove_video: true,
   });
   check('删除视频 200', r.status === 200, `status=${r.status}`);
-  check('video 已清空', r.data?.data?.video === null || r.data?.data?.video === undefined, JSON.stringify(r.data?.data?.video));
+  check('video 已清空', r.data?.video === null || r.data?.video === undefined, JSON.stringify(r.data?.video));
   check('视频文件已删除', !fs.existsSync(abs2), abs2);
 
   console.log('\n===== 8. 清理测试日志 =====');

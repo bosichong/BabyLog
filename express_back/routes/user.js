@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { verifyToken, hashPassword } = require('../middleware/auth');
+const { sendError } = require('../utils/api-error');
+const { sendSuccess } = require('../utils/api-response');
 
 // 获取所有用户
 router.get('/', verifyToken, async (req, res) => {
@@ -8,13 +10,9 @@ router.get('/', verifyToken, async (req, res) => {
     const users = await req.models.User.findAll({
       attributes: { exclude: ['hashed_password'] }
     });
-    res.json(users);
+    return sendSuccess(res, users);
   } catch (error) {
-    console.error('获取用户列表失败:', error);
-    res.status(500).json({
-      status: 'error',
-      message: '获取用户列表失败'
-    });
+    return sendError(req, res, 500, '获取用户列表失败', error);
   }
 });
 
@@ -25,18 +23,11 @@ router.get('/:id', verifyToken, async (req, res) => {
       attributes: { exclude: ['hashed_password'] }
     });
     if (!user) {
-      return res.status(404).json({
-        status: 'error',
-        message: '用户不存在'
-      });
+      return sendError(req, res, 404, '用户不存在');
     }
-    res.json(user);
+    return sendSuccess(res, user);
   } catch (error) {
-    console.error('获取用户失败:', error);
-    res.status(500).json({
-      status: 'error',
-      message: '获取用户失败'
-    });
+    return sendError(req, res, 500, '获取用户失败', error);
   }
 });
 
@@ -53,13 +44,9 @@ router.post('/', verifyToken, async (req, res) => {
       is_active: true
     });
     const { hashed_password, ...userWithoutPassword } = user.toJSON();
-    res.status(201).json(userWithoutPassword);
+    return sendSuccess(res, userWithoutPassword, { status: 201 });
   } catch (error) {
-    console.error('创建用户失败:', error);
-    res.status(500).json({
-      status: 'error',
-      message: '创建用户失败'
-    });
+    return sendError(req, res, 500, '创建用户失败', error);
   }
 });
 
@@ -69,10 +56,7 @@ router.post('/:id/update', verifyToken, async (req, res) => {
     const { family_member, gender, is_active, password } = req.body;
     const user = await req.models.User.findByPk(req.params.id);
     if (!user) {
-      return res.status(404).json({
-        status: 'error',
-        message: '用户不存在'
-      });
+      return sendError(req, res, 404, '用户不存在');
     }
     const updateData = {};
     if (family_member !== undefined) updateData.family_member = family_member;
@@ -84,13 +68,9 @@ router.post('/:id/update', verifyToken, async (req, res) => {
 
     await user.update(updateData);
     const { hashed_password, ...userWithoutPassword } = user.toJSON();
-    res.json(userWithoutPassword);
+    return sendSuccess(res, userWithoutPassword);
   } catch (error) {
-    console.error('更新用户失败:', error);
-    res.status(500).json({
-      status: 'error',
-      message: '更新用户失败'
-    });
+    return sendError(req, res, 500, '更新用户失败', error);
   }
 });
 
@@ -99,19 +79,12 @@ router.post('/:id/delete', verifyToken, async (req, res) => {
   try {
     const user = await req.models.User.findByPk(req.params.id);
     if (!user) {
-      return res.status(404).json({
-        status: 'error',
-        message: '用户不存在'
-      });
+      return sendError(req, res, 404, '用户不存在');
     }
     await user.destroy();
-    res.status(204).send();
+    return res.status(204).send();
   } catch (error) {
-    console.error('删除用户失败:', error);
-    res.status(500).json({
-      status: 'error',
-      message: '删除用户失败'
-    });
+    return sendError(req, res, 500, '删除用户失败', error);
   }
 });
 

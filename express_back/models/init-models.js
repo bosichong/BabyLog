@@ -1,4 +1,8 @@
+const { installDatabaseQueryLogger } = require('../utils/database-logger');
+
 function initModels(sequelize) {
+  installDatabaseQueryLogger(sequelize);
+
   const User = require('./user')(sequelize);
   const Baby = require('./baby')(sequelize);
   const Blog = require('./blog')(sequelize);

@@ -29,13 +29,13 @@ export default function RegisterPage() {
     setLoading(true)
     setError('')
     try {
-      const res = await authAPI.register({
+      await authAPI.register({
         username: form.username.trim(),
         password: form.password,
         family_member: form.family_member.trim() || '默认成员',
         gender: form.gender,
       })
-      setDone(res.message || '注册成功，请等待管理员审核激活')
+      setDone('注册成功，请等待管理员审核激活')
       setTimeout(() => navigate('/login'), 2500)
     } catch (err) {
       setError(err instanceof Error ? err.message : '注册失败，请稍后重试')
